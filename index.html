@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IBM Global Initiatives</title>
+    <link rel="stylesheet" href="styles.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;600&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <header class="header">
+        <div class="ibm-logo" aria-label="IBM">
+            <div class="ibm-stripes">
+                <span class="stripe"></span>
+                <span class="stripe"></span>
+                <span class="stripe"></span>
+                <span class="stripe"></span>
+                <span class="stripe"></span>
+                <span class="stripe"></span>
+                <span class="stripe"></span>
+                <span class="stripe"></span>
+            </div>
+        </div>
+        <div class="header-text">
+            <h1 class="title">IBM</h1>
+            <p class="subtitle">Global initiatives · Powered by D3 &amp; GeoJSON</p>
+        </div>
+    </header>
+
+    <main class="stage">
+        <canvas id="globe"></canvas>
+    </main>
+
+    <footer class="footer">
+        <span class="footer-tag">Think</span>
+        <span class="footer-dot">·</span>
+        <a href="https://d3js.org/" target="_blank" rel="noopener">D3</a>
+        <span class="footer-dot">·</span>
+        <span>GeoJSON</span>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3-geo@3/dist/d3-geo.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
