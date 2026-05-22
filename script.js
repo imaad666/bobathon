@@ -136,14 +136,26 @@ function extractPoints(geojson) {
 }
 
 function draw() {
+    // IBM-style background with horizontal stripes
     ctx.fillStyle = "#161616";
     ctx.fillRect(0, 0, width, height);
+
+    // Draw subtle IBM stripes in background
+    ctx.globalAlpha = 0.04;
+    const stripeHeight = 50;
+    ctx.fillStyle = "#0f62fe";
+    for (let y = 0; y < height; y += stripeHeight * 2) {
+        ctx.fillRect(0, y, width, stripeHeight);
+    }
+    ctx.globalAlpha = 1.0;
+
     if (!ready) return;
 
     const cx = width / 2;
     const cy = height / 2;
     const buckets = Array.from({ length: BUCKETS }, () => []);
 
+    // Render globe points
     for (const point of points) {
         const [x, y, z] = rotateXYZ(point, lambda, phi);
         if (z < 0.02) continue;
@@ -156,6 +168,172 @@ function draw() {
             ctx.fillStyle = ibmDotColor(z);
             ctx.fillRect(x - DOT_SIZE / 2, y - DOT_SIZE / 2, DOT_SIZE, DOT_SIZE);
         }
+    }
+
+    // Render IBM initiative markers
+    const time = Date.now() * 0.001;
+    for (const initiative of initiatives) {
+        const xyz = lonLatToXYZ([initiative.lon, initiative.lat]);
+        const [x, y, z] = rotateXYZ(xyz, lambda, phi);
+
+        // Only show front-facing markers
+        if (z < 0) continue;
+
+        const screenX = cx + x * radius;
+        const screenY = cy - y * radius;
+        const markerSize = 5;
+
+        // Pulsing glow effect
+        const pulse = Math.sin(time * 2 + initiative.lat) * 0.3 + 0.7;
+        ctx.globalAlpha = pulse * 0.4;
+        ctx.fillStyle = initiative.color;
+        ctx.beginPath();
+        ctx.arc(screenX, screenY, markerSize * 2.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Main marker
+
+        // Mouse hover for markers
+        canvas.addEventListener("mousemove", (e) => {
+            if (dragging) return;
+
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = e.clientX - rect.left;
+            const mouseY = e.clientY - rect.top;
+
+            const cx = width / 2;
+            const cy = height / 2;
+
+            hoveredMarker = null;
+
+            for (const initiative of initiatives) {
+                const xyz = lonLatToXYZ([initiative.lon, initiative.lat]);
+                const [x, y, z] = rotateXYZ(xyz, lambda, phi);
+
+                if (z < 0) continue;
+
+                const screenX = cx + x * radius;
+                const screenY = cy - y * radius;
+                const distance = Math.sqrt((mouseX - screenX) ** 2 + (mouseY - screenY) ** 2);
+
+                if (distance < 10) {
+                    hoveredMarker = initiative;
+                    canvas.style.cursor = 'pointer';
+                    showTooltip(e, initiative);
+                    return;
+                }
+            }
+
+            canvas.style.cursor = 'grab';
+            hideTooltip();
+        });
+
+        canvas.addEventListener("click", (e) => {
+            if (hoveredMarker && !dragging) {
+                showInfoPanel(hoveredMarker);
+            }
+        });
+
+        function showTooltip(e, initiative) {
+            if (!tooltip) {
+                tooltip = document.createElement('div');
+                tooltip.style.position = 'fixed';
+                tooltip.style.background = 'rgba(15, 98, 254, 0.95)';
+                tooltip.style.color = 'white';
+                tooltip.style.padding = '8px 12px';
+                tooltip.style.borderRadius = '4px';
+                tooltip.style.fontSize = '12px';
+                tooltip.style.fontFamily = '"IBM Plex Sans", sans-serif';
+                tooltip.style.pointerEvents = 'none';
+                tooltip.style.zIndex = '1000';
+                tooltip.style.border = '1px solid #4589ff';
+                tooltip.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
+                document.body.appendChild(tooltip);
+            }
+
+            tooltip.innerHTML = `<strong>${initiative.name}</strong><br>${initiative.location}`;
+            tooltip.style.left = (e.clientX + 15) + 'px';
+            tooltip.style.top = (e.clientY + 15) + 'px';
+            tooltip.style.display = 'block';
+        }
+
+        function hideTooltip() {
+            if (tooltip) {
+                tooltip.style.display = 'none';
+            }
+        }
+
+        function showInfoPanel(initiative) {
+            let panel = document.getElementById('info-panel');
+
+            if (!panel) {
+                panel = document.createElement('div');
+                panel.id = 'info-panel';
+                panel.style.position = 'fixed';
+                panel.style.right = '20px';
+                panel.style.top = '50%';
+                panel.style.transform = 'translateY(-50%)';
+                panel.style.width = '320px';
+                panel.style.maxHeight = '80vh';
+                panel.style.background = 'rgba(38, 38, 38, 0.95)';
+                panel.style.border = '2px solid #0f62fe';
+                panel.style.borderRadius = '8px';
+                panel.style.padding = '20px';
+                panel.style.color = '#f4f4f4';
+                panel.style.fontFamily = '"IBM Plex Sans", sans-serif';
+                panel.style.zIndex = '1001';
+                panel.style.backdropFilter = 'blur(10px)';
+                panel.style.boxShadow = '0 8px 32px rgba(15, 98, 254, 0.3)';
+                panel.style.overflowY = 'auto';
+
+                const closeBtn = document.createElement('button');
+                closeBtn.innerHTML = '×';
+                closeBtn.style.position = 'absolute';
+                closeBtn.style.top = '10px';
+                closeBtn.style.right = '10px';
+                closeBtn.style.background = 'transparent';
+                closeBtn.style.border = 'none';
+                closeBtn.style.color = '#f4f4f4';
+                closeBtn.style.fontSize = '24px';
+                closeBtn.style.cursor = 'pointer';
+                closeBtn.style.width = '30px';
+                closeBtn.style.height = '30px';
+                closeBtn.onclick = () => panel.style.display = 'none';
+
+                panel.appendChild(closeBtn);
+                document.body.appendChild(panel);
+            }
+
+            panel.innerHTML = `
+        <button onclick="this.parentElement.style.display='none'" style="position: absolute; top: 10px; right: 10px; background: transparent; border: none; color: #f4f4f4; font-size: 24px; cursor: pointer; width: 30px; height: 30px;">×</button>
+        <h2 style="color: ${initiative.color}; font-family: 'IBM Plex Mono', monospace; margin-bottom: 15px; font-size: 1.3rem;">${initiative.name}</h2>
+        <p style="margin-bottom: 10px;"><strong>📍 Location:</strong> ${initiative.location}</p>
+        <p style="margin-bottom: 10px;"><strong>🏢 Company:</strong> ${initiative.company}</p>
+        <p style="margin-bottom: 10px;"><strong>📝 Description:</strong> ${initiative.desc}</p>
+        <div style="margin-top: 15px;">
+            <span style="display: inline-block; padding: 5px 12px; background: ${initiative.color}; border-radius: 4px; font-size: 0.85rem; font-family: 'IBM Plex Mono', monospace;">${initiative.type}</span>
+        </div>
+    `;
+
+            panel.style.display = 'block';
+        }
+        ctx.globalAlpha = 1.0;
+        ctx.fillStyle = initiative.color;
+        ctx.beginPath();
+        ctx.arc(screenX, screenY, markerSize, 0, Math.PI * 2);
+        ctx.fill();
+
+        // White border
+        ctx.strokeStyle = "#ffffff";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Outer pulse ring
+        ctx.globalAlpha = pulse * 0.6;
+        ctx.beginPath();
+        ctx.arc(screenX, screenY, markerSize * 1.8, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.globalAlpha = 1.0;
     }
 }
 
