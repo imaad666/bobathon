@@ -4,48 +4,249 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IBM Global Initiatives</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>IBM Global Initiatives — Worldwide presence</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;600&display=swap"
+        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap"
         rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
-    <header class="header">
-        <div class="ibm-logo" aria-label="IBM">
-            <div class="ibm-stripes">
-                <span class="stripe"></span>
-                <span class="stripe"></span>
-                <span class="stripe"></span>
-                <span class="stripe"></span>
-                <span class="stripe"></span>
-                <span class="stripe"></span>
-                <span class="stripe"></span>
-                <span class="stripe"></span>
+    <div class="app">
+        <header class="header">
+            <a href="/" class="brand">
+                <div class="ibm-mark" aria-hidden="true">
+                    <span></span><span></span><span></span><span></span>
+                    <span></span><span></span><span></span><span></span>
+                </div>
+                <span class="brand-text">IBM <span class="brand-sub">Global</span></span>
+            </a>
+
+            <nav class="nav-pill" aria-label="Main">
+                <a href="/" class="nav-link active">Overview</a>
+                <a href="#offices" class="nav-link">Offices</a>
+                <a href="#clients" class="nav-link">Clients</a>
+                <a href="#partners" class="nav-link nav-link-filled">Partners</a>
+            </nav>
+
+            <div class="header-actions">
+                <button type="button" class="network-btn" id="view-filter" aria-haspopup="listbox">
+                    <span class="network-label">View</span>
+                    <span class="network-value" id="view-label">All sites</span>
+                    <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="m6 9 6 6 6-6" />
+                    </svg>
+                </button>
+                <button type="button" class="icon-btn menu-btn" aria-label="Menu">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
             </div>
-        </div>
-        <div class="header-text">
-            <h1 class="title">IBM</h1>
-            <p class="subtitle">Global initiatives · Powered by D3 &amp; GeoJSON</p>
-        </div>
-    </header>
+        </header>
 
-    <main class="stage">
-        <canvas id="globe"></canvas>
-    </main>
+        <section class="hero">
+            <canvas id="globe" class="globe-canvas" aria-label="Interactive globe of IBM global presence"></canvas>
 
-    <footer class="footer">
-        <span class="footer-tag">Think</span>
-        <span class="footer-dot">·</span>
-        <a href="https://d3js.org/" target="_blank" rel="noopener">D3</a>
-        <span class="footer-dot">·</span>
-        <span>GeoJSON</span>
-    </footer>
+            <div class="hero-floats">
+                <button type="button" class="float-btn" id="btn-legend" aria-label="Legend">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M12 16v-4M12 8h.01" />
+                    </svg>
+                </button>
+                <button type="button" class="float-btn" id="btn-reset" aria-label="Reset view">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                        <path d="M3 3v5h5" />
+                    </svg>
+                </button>
+            </div>
+
+            <aside class="validator-panel" id="focus-panel">
+                <div class="validator-panel-inner">
+                    <div class="validator-top">
+                        <div class="validator-id">
+                            <div class="validator-avatar" id="focus-icon">IBM</div>
+                            <div>
+                                <div class="validator-name" id="focus-name">Armonk Headquarters</div>
+                                <div class="validator-city" id="focus-city">New York, United States</div>
+                            </div>
+                        </div>
+                        <div class="validator-rank">
+                            <span class="rank-num" id="focus-type">Office</span>
+                            <div class="rank-ring" id="focus-ring" style="--pct: 100">
+                                <svg viewBox="0 0 36 36">
+                                    <circle class="ring-bg" cx="18" cy="18" r="15.5" />
+                                    <circle class="ring-fg" cx="18" cy="18" r="15.5" />
+                                </svg>
+                                <span id="focus-pct">—</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="validator-stats">
+                        <div><strong id="stat-offices">175+</strong><span>offices</span></div>
+                        <div><strong id="stat-countries">170+</strong><span>countries</span></div>
+                        <div><strong id="stat-sites">420+</strong><span>global sites</span></div>
+                    </div>
+                </div>
+            </aside>
+
+            <div class="globe-legend" id="globe-legend" hidden>
+                <span><i class="dot dot-office"></i> Offices</span>
+                <span><i class="dot dot-client"></i> Clients</span>
+                <span><i class="dot dot-partner"></i> Dependencies</span>
+                <span><i class="dot dot-initiative"></i> Initiatives</span>
+            </div>
+        </section>
+
+        <section class="dashboard" id="dashboard">
+            <div class="dashboard-inner">
+                <div class="row-duo">
+                    <article class="card card-proposal">
+                        <div class="card-head">
+                            <h3>Presence by Region</h3>
+                            <span class="badge badge-live"><span class="live-dot"></span> Live</span>
+                        </div>
+                        <div class="proposal-legend">
+                            <span><i class="swatch swatch-office"></i> Offices</span>
+                            <span><i class="swatch swatch-client"></i> Clients</span>
+                            <span><i class="swatch swatch-partner"></i> Partners</span>
+                        </div>
+                        <canvas id="region-chart" class="proposal-bars" height="56"></canvas>
+                        <div class="proposal-foot">
+                            <span>Coverage: <strong id="coverage-pct">94%</strong> of regions</span>
+                            <span id="region-total">6 / 6</span>
+                        </div>
+                    </article>
+
+                    <article class="card card-blocks">
+                        <div class="card-head">
+                            <h3>Recent Global Activity</h3>
+                            <span class="badge badge-live"><span class="live-dot"></span> Live</span>
+                        </div>
+                        <ul class="block-list" id="activity-list"></ul>
+                    </article>
+                </div>
+
+                <div class="row-trio">
+                    <article class="card card-metric card-tps">
+                        <div class="card-head">
+                            <h3>Cloud Regions</h3>
+                            <span class="badge badge-live"><span class="live-dot"></span> Active</span>
+                        </div>
+                        <canvas class="spark-chart" data-chart="bars" data-accent="blue" height="48"></canvas>
+                        <div class="metric-value" id="val-cloud">34</div>
+                    </article>
+
+                    <article class="card card-metric">
+                        <div class="card-head">
+                            <h3>Research Labs <span class="sub">(worldwide)</span></h3>
+                            <span class="badge">12 sites</span>
+                        </div>
+                        <canvas class="spark-chart" data-chart="peak" data-accent="purple" height="48"></canvas>
+                        <div class="metric-value"><span id="val-labs">12</span> <span class="unit">labs</span></div>
+                    </article>
+
+                    <article class="card card-block-info">
+                        <div class="block-info-grid">
+                            <div class="bi-item">
+                                <span class="bi-label">EMPLOYEES</span>
+                                <span class="bi-val" id="val-employees">~288K</span>
+                            </div>
+                            <div class="bi-item bi-validator">
+                                <span class="bi-label">FLAGSHIP</span>
+                                <span class="bi-val"><span class="val-icon">★</span> IBM Research — Yorktown Heights</span>
+                            </div>
+                            <div class="bi-item">
+                                <span class="bi-label">CLIENTS</span>
+                                <span class="bi-val" id="val-clients">95% Fortune 500</span>
+                            </div>
+                            <div class="bi-item">
+                                <span class="bi-label">SUBSIDIARIES</span>
+                                <span class="bi-val" id="val-subs">Red Hat, Apptio, HashiCorp</span>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+
+                <div class="row-duo">
+                    <article class="card card-metric">
+                        <div class="card-head"><h3>Enterprise Clients</h3><span class="badge">global</span></div>
+                        <canvas class="spark-chart" data-chart="bars" data-accent="blue" height="40"></canvas>
+                        <div class="metric-value"><span id="val-enterprise">12.4K</span> <span class="unit">accounts</span></div>
+                    </article>
+                    <article class="card card-metric">
+                        <div class="card-head"><h3>Consulting Partners</h3><span class="badge">ecosystem</span></div>
+                        <canvas class="spark-chart" data-chart="flat" data-accent="teal" height="40"></canvas>
+                        <div class="metric-value"><span id="val-consulting">3.2K</span> <span class="unit">firms</span></div>
+                    </article>
+                </div>
+
+                <div class="row-duo">
+                    <article class="card card-metric">
+                        <div class="card-head"><h3>Technology Dependencies</h3><span class="badge">strategic</span></div>
+                        <canvas class="spark-chart" data-chart="bars" data-accent="orange" height="40"></canvas>
+                        <div class="metric-value"><span id="val-deps">840</span> <span class="unit">vendors</span></div>
+                    </article>
+                    <article class="card card-metric">
+                        <div class="card-head"><h3>Quantum Sites</h3><span class="badge">IBM Quantum</span></div>
+                        <canvas class="spark-chart" data-chart="flat" data-accent="purple" height="40"></canvas>
+                        <div class="metric-value"><span id="val-quantum">5</span> <span class="unit">systems</span></div>
+                    </article>
+                </div>
+
+                <div class="row-duo">
+                    <article class="card card-metric">
+                        <div class="card-head"><h3>Sustainability Programs</h3><span class="badge">2025</span></div>
+                        <canvas class="spark-chart" data-chart="flat" data-accent="green" height="40"></canvas>
+                        <div class="metric-value"><span id="val-sustain">67</span> <span class="unit">initiatives</span></div>
+                    </article>
+                    <article class="card card-metric">
+                        <div class="card-head"><h3>Largest Campus</h3><span class="badge">by headcount</span></div>
+                        <canvas class="spark-chart" data-chart="bars" data-accent="blue" height="40"></canvas>
+                        <div class="metric-value"><span id="val-campus">Bangalore</span></div>
+                    </article>
+                </div>
+
+                <div class="row-trio row-stake">
+                    <article class="card card-metric">
+                        <div class="card-head"><h3>Annual Revenue</h3><span class="badge">FY24</span></div>
+                        <div class="metric-value metric-value-lg"><span id="val-revenue">$62.8B</span></div>
+                    </article>
+                    <article class="card card-metric card-pending">
+                        <div class="card-head"><h3>AI &amp; Hybrid Cloud</h3><span class="badge">growth focus</span></div>
+                        <div class="pending-bar"><span class="pending-fill ibm-fill"></span></div>
+                        <div class="metric-value metric-value-pos">+<span id="val-growth">14.2</span><span class="unit">% YoY</span></div>
+                    </article>
+                    <article class="card card-metric">
+                        <div class="card-head"><h3>Patents (cumulative)</h3><span class="badge">US record</span></div>
+                        <div class="metric-value metric-value-lg" id="val-patents">150K+</div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <footer class="footer">
+            <div class="footer-links">
+                <a href="#offices">/offices</a>
+                <a href="#clients">/clients</a>
+                <a href="#partners">/partners</a>
+            </div>
+            <div class="footer-center">
+                <p class="footer-tagline"><span class="hl">IBM Global Initiatives</span> — offices, clients &amp; partners worldwide</p>
+                <p class="footer-sub">Powered by D3 &amp; GeoJSON · Explore how IBM operates across the planet</p>
+            </div>
+            <span class="footer-badge">Think</span>
+        </footer>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
     <script src="https://cdn.jsdelivr.net/npm/d3-geo@3/dist/d3-geo.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/topojson-client@3"></script>
+    <script src="data.js"></script>
     <script src="script.js"></script>
 </body>
 
