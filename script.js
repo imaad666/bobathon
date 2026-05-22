@@ -41,6 +41,25 @@ let autoRotate = true;
 let dragging = false;
 let lastX = 0;
 let lastY = 0;
+
+// IBM Initiatives Data
+const initiatives = [
+    { name: "IBM Watson AI", location: "New York, USA", lat: 40.7128, lon: -74.0060, company: "IBM", type: "cloud-ai", color: "#0f62fe", desc: "Leading AI platform" },
+    { name: "IBM Quantum Network", location: "Yorktown Heights, USA", lat: 41.2707, lon: -73.8084, company: "IBM", type: "quantum", color: "#ee5396", desc: "Quantum computing research" },
+    { name: "Red Hat OpenShift", location: "Raleigh, USA", lat: 35.7796, lon: -78.6382, company: "Red Hat", type: "redhat", color: "#8a3ffc", desc: "Enterprise Kubernetes" },
+    { name: "IBM Research Tokyo", location: "Tokyo, Japan", lat: 35.6762, lon: 139.6503, company: "IBM", type: "research", color: "#ff832b", desc: "AI & quantum research" },
+    { name: "IBM Cloud London", location: "London, UK", lat: 51.5074, lon: -0.1278, company: "IBM", type: "cloud-ai", color: "#0f62fe", desc: "European cloud hub" },
+    { name: "IBM Sustainability", location: "São Paulo, Brazil", lat: -23.5505, lon: -46.6333, company: "IBM", type: "sustainability", color: "#24a148", desc: "Environmental AI solutions" },
+    { name: "IBM Research Zurich", location: "Zurich, Switzerland", lat: 47.3769, lon: 8.5417, company: "IBM", type: "research", color: "#ff832b", desc: "Nobel Prize-winning lab" },
+    { name: "IBM India Labs", location: "Bangalore, India", lat: 12.9716, lon: 77.5946, company: "IBM", type: "cloud-ai", color: "#0f62fe", desc: "Largest dev center" },
+    { name: "IBM Research Australia", location: "Melbourne, Australia", lat: -37.8136, lon: 144.9631, company: "IBM", type: "research", color: "#ff832b", desc: "Blockchain & AI research" },
+    { name: "IBM Quantum Frascati", location: "Frascati, Italy", lat: 41.8089, lon: 12.6819, company: "IBM", type: "quantum", color: "#ee5396", desc: "European quantum hub" },
+    { name: "Red Hat EMEA HQ", location: "Munich, Germany", lat: 48.1351, lon: 11.5820, company: "Red Hat", type: "redhat", color: "#8a3ffc", desc: "Open source solutions" },
+    { name: "IBM Africa Initiative", location: "Nairobi, Kenya", lat: -1.2921, lon: 36.8219, company: "IBM", type: "sustainability", color: "#24a148", desc: "Agriculture & climate AI" }
+];
+
+let hoveredMarker = null;
+let tooltip = null;
 let ready = false;
 
 function resize() {
