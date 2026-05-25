@@ -1,393 +1,540 @@
-const canvas = document.getElementById("globe");
-const ctx = canvas.getContext("2d");
+/* IBM Global — gmonads-style UI, glowy globe */
 
-const DEG2RAD = Math.PI / 180;
-const SAMPLE_STEP = 0.4 * DEG2RAD;
-const DOT_SIZE = 1.5;
-const ROTATION_SPEED = 0.00035;
-const BUCKETS = 48;
+(function () {
+    const DEG2RAD = Math.PI / 180;
+    const LAND_GRID_STEP = 1.25 * DEG2RAD;
+    const OCEAN_COUNT = 6500;
+    const BUCKETS = 48;
+    const IBM_BLUE = "#1b4d8c";
+    const IBM_CREAM = "#f4f0e8";
+    const IBM_BORDER = "#0c2340";
+    const STRIPE_BAND_DEG = 5.5;
 
-const IBM_BLUE = {
-    back: [0, 29, 108],
-    mid: [0, 67, 206],
-    front: [15, 98, 254],
-    highlight: [69, 137, 255],
-};
+    let countriesFeatures = [];
+    let oceanPoints = [];
+    let landSet = null;
+    let globeReady = false;
+    let globeError = null;
+    let activeFilter = "all";
 
-function ibmDotColor(depth) {
-    const t = (depth + 1) / 2;
-    let r, g, b;
-    if (t < 0.5) {
-        const u = t / 0.5;
-        r = IBM_BLUE.back[0] + (IBM_BLUE.mid[0] - IBM_BLUE.back[0]) * u;
-        g = IBM_BLUE.back[1] + (IBM_BLUE.mid[1] - IBM_BLUE.back[1]) * u;
-        b = IBM_BLUE.back[2] + (IBM_BLUE.mid[2] - IBM_BLUE.back[2]) * u;
-    } else {
-        const u = (t - 0.5) / 0.5;
-        r = IBM_BLUE.mid[0] + (IBM_BLUE.highlight[0] - IBM_BLUE.mid[0]) * u;
-        g = IBM_BLUE.mid[1] + (IBM_BLUE.highlight[1] - IBM_BLUE.mid[1]) * u;
-        b = IBM_BLUE.mid[2] + (IBM_BLUE.highlight[2] - IBM_BLUE.mid[2]) * u;
+    let globeCanvas, gCtx, gW = 800, gH = 400, gR = 180, dpr = 1;
+    let lambda = 0.55, phi = 0.2;
+    let autoRotate = true, dragging = false, lastX, lastY;
+
+    function lonLatToXYZ([lon, lat]) {
+        const la = lat * DEG2RAD, lo = lon * DEG2RAD, cl = Math.cos(la);
+        return [cl * Math.cos(lo), Math.sin(la), cl * Math.sin(lo)];
     }
-    return `rgb(${r | 0}, ${g | 0}, ${b | 0})`;
-}
 
-let width = 800;
-let height = 600;
-let radius = 200;
-let points = [];
-let lambda = 0;
-let phi = 0;
-let autoRotate = true;
-let dragging = false;
-let lastX = 0;
-let lastY = 0;
+    function rotateXYZ([x, y, z], l, p) {
+        const cL = Math.cos(l), sL = Math.sin(l), cP = Math.cos(p), sP = Math.sin(p);
+        const x1 = cL * x + sL * z, z1 = -sL * x + cL * z;
+        return [x1, cP * y - sP * z1, sP * y + cP * z1];
+    }
 
-// IBM Initiatives Data
-const initiatives = [
-    { name: "IBM Watson AI", location: "New York, USA", lat: 40.7128, lon: -74.0060, company: "IBM", type: "cloud-ai", color: "#0f62fe", desc: "Leading AI platform" },
-    { name: "IBM Quantum Network", location: "Yorktown Heights, USA", lat: 41.2707, lon: -73.8084, company: "IBM", type: "quantum", color: "#ee5396", desc: "Quantum computing research" },
-    { name: "Red Hat OpenShift", location: "Raleigh, USA", lat: 35.7796, lon: -78.6382, company: "Red Hat", type: "redhat", color: "#8a3ffc", desc: "Enterprise Kubernetes" },
-    { name: "IBM Research Tokyo", location: "Tokyo, Japan", lat: 35.6762, lon: 139.6503, company: "IBM", type: "research", color: "#ff832b", desc: "AI & quantum research" },
-    { name: "IBM Cloud London", location: "London, UK", lat: 51.5074, lon: -0.1278, company: "IBM", type: "cloud-ai", color: "#0f62fe", desc: "European cloud hub" },
-    { name: "IBM Sustainability", location: "São Paulo, Brazil", lat: -23.5505, lon: -46.6333, company: "IBM", type: "sustainability", color: "#24a148", desc: "Environmental AI solutions" },
-    { name: "IBM Research Zurich", location: "Zurich, Switzerland", lat: 47.3769, lon: 8.5417, company: "IBM", type: "research", color: "#ff832b", desc: "Nobel Prize-winning lab" },
-    { name: "IBM India Labs", location: "Bangalore, India", lat: 12.9716, lon: 77.5946, company: "IBM", type: "cloud-ai", color: "#0f62fe", desc: "Largest dev center" },
-    { name: "IBM Research Australia", location: "Melbourne, Australia", lat: -37.8136, lon: 144.9631, company: "IBM", type: "research", color: "#ff832b", desc: "Blockchain & AI research" },
-    { name: "IBM Quantum Frascati", location: "Frascati, Italy", lat: 41.8089, lon: 12.6819, company: "IBM", type: "quantum", color: "#ee5396", desc: "European quantum hub" },
-    { name: "Red Hat EMEA HQ", location: "Munich, Germany", lat: 48.1351, lon: 11.5820, company: "Red Hat", type: "redhat", color: "#8a3ffc", desc: "Open source solutions" },
-    { name: "IBM Africa Initiative", location: "Nairobi, Kenya", lat: -1.2921, lon: 36.8219, company: "IBM", type: "sustainability", color: "#24a148", desc: "Agriculture & climate AI" }
-];
-
-let hoveredMarker = null;
-let tooltip = null;
-let ready = false;
-
-function resize() {
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    const rect = canvas.getBoundingClientRect();
-    width = Math.max(rect.width || window.innerWidth || 800, 320);
-    height = Math.max(rect.height || window.innerHeight || 600, 320);
-    canvas.width = Math.floor(width * dpr);
-    canvas.height = Math.floor(height * dpr);
-    canvas.style.width = `${width}px`;
-    canvas.style.height = `${height}px`;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    radius = Math.min(width, height) * 0.38;
-}
-
-function lonLatToXYZ([lon, lat]) {
-    const la = lat * DEG2RAD;
-    const lo = lon * DEG2RAD;
-    const cl = Math.cos(la);
-    return [cl * Math.cos(lo), Math.sin(la), cl * Math.sin(lo)];
-}
-
-function rotateXYZ([x, y, z], lambdaRad, phiRad) {
-    const cosL = Math.cos(lambdaRad);
-    const sinL = Math.sin(lambdaRad);
-    const cosP = Math.cos(phiRad);
-    const sinP = Math.sin(phiRad);
-
-    const x1 = cosL * x + sinL * z;
-    const z1 = -sinL * x + cosL * z;
-    const y2 = cosP * y - sinP * z1;
-    const z2 = sinP * y + cosP * z1;
-
-    return [x1, y2, z2];
-}
-
-function sampleRing(ring) {
-    const samples = [];
-    for (let i = 0; i < ring.length - 1; i++) {
-        const a = ring[i];
-        const b = ring[i + 1];
-        const dist = d3.geoDistance(a, b);
-        const segments = Math.max(1, Math.ceil(dist / SAMPLE_STEP));
-        for (let j = 0; j < segments; j++) {
-            samples.push(d3.geoInterpolate(a, b)(j / segments));
+    function sampleRing(ring) {
+        const out = [];
+        for (let i = 0; i < ring.length - 1; i++) {
+            const a = ring[i], b = ring[i + 1];
+            const n = Math.max(1, Math.ceil(d3.geoDistance(a, b) / LAND_GRID_STEP));
+            for (let j = 0; j < n; j++) out.push(d3.geoInterpolate(a, b)(j / n));
         }
+        return out;
     }
-    return samples;
-}
 
-function extractPoints(geojson) {
-    const all = [];
-    for (const feature of geojson.features) {
-        const geom = feature.geometry;
-        if (!geom) continue;
+    function stripeAtLat(lat) {
+        const band = Math.floor((lat + 90) / STRIPE_BAND_DEG);
+        return band % 2 === 0 ? IBM_BLUE : IBM_CREAM;
+    }
 
-        const processPolygon = (coordinates) => {
-            for (const ring of coordinates) {
-                for (const coord of sampleRing(ring)) {
-                    all.push(lonLatToXYZ(coord));
-                }
-            }
+    const latStripCache = new Map();
+
+    function latStripGeom(lat0, lat1) {
+        const key = `${lat0}|${lat1}`;
+        if (latStripCache.has(key)) return latStripCache.get(key);
+        const geom = {
+            type: "Polygon",
+            coordinates: [[
+                [-180, lat0], [180, lat0], [180, lat1], [-180, lat1], [-180, lat0],
+            ]],
         };
+        latStripCache.set(key, geom);
+        return geom;
+    }
 
-        if (geom.type === "Polygon") {
-            processPolygon(geom.coordinates);
-        } else if (geom.type === "MultiPolygon") {
-            for (const polygon of geom.coordinates) {
-                processPolygon(polygon);
+    function buildLandSet(geojson) {
+        const grid = new Set();
+        for (const f of geojson.features) {
+            const g = f.geometry;
+            if (!g) continue;
+            const polys = g.type === "Polygon" ? [g.coordinates] : g.coordinates;
+            for (const poly of polys)
+                for (const ring of poly)
+                    for (const c of sampleRing(ring)) {
+                        grid.add(`${(c[0] * 2) | 0},${(c[1] * 2) | 0}`);
+                    }
+        }
+        landSet = grid;
+    }
+
+    const latStripFeature = (lat0, lat1) => ({
+        type: "Feature",
+        geometry: latStripGeom(lat0, lat1),
+        properties: {},
+    });
+
+    function drawLand(gCtx, path, features) {
+        const sorted = [...features].sort((a, b) => d3.geoArea(b) - d3.geoArea(a));
+        gCtx.globalAlpha = 1;
+        gCtx.globalCompositeOperation = "source-over";
+
+        for (const feature of sorted) {
+            const [[, minLat], [, maxLat]] = d3.geoBounds(feature);
+            const latStart = Math.floor((minLat + 90) / STRIPE_BAND_DEG) * STRIPE_BAND_DEG - 90;
+
+            for (let lat0 = latStart; lat0 <= maxLat; lat0 += STRIPE_BAND_DEG) {
+                const lat1 = lat0 + STRIPE_BAND_DEG;
+                gCtx.save();
+                gCtx.beginPath();
+                path(feature);
+                gCtx.clip();
+                gCtx.fillStyle = stripeAtLat(lat0 + STRIPE_BAND_DEG * 0.5);
+                gCtx.beginPath();
+                path(latStripFeature(lat0, lat1));
+                gCtx.fill();
+                gCtx.restore();
             }
         }
-    }
-    return all;
-}
 
-function draw() {
-    // IBM-style background with horizontal stripes
-    ctx.fillStyle = "#161616";
-    ctx.fillRect(0, 0, width, height);
-
-    // Draw subtle IBM stripes in background
-    ctx.globalAlpha = 0.04;
-    const stripeHeight = 50;
-    ctx.fillStyle = "#0f62fe";
-    for (let y = 0; y < height; y += stripeHeight * 2) {
-        ctx.fillRect(0, y, width, stripeHeight);
-    }
-    ctx.globalAlpha = 1.0;
-
-    if (!ready) return;
-
-    const cx = width / 2;
-    const cy = height / 2;
-    const buckets = Array.from({ length: BUCKETS }, () => []);
-
-    // Render globe points
-    for (const point of points) {
-        const [x, y, z] = rotateXYZ(point, lambda, phi);
-        if (z < 0.02) continue;
-        const bucket = Math.min(BUCKETS - 1, (z * BUCKETS) | 0);
-        buckets[bucket].push({ x: cx + x * radius, y: cy - y * radius, z });
-    }
-
-    for (const bucket of buckets) {
-        for (const { x, y, z } of bucket) {
-            ctx.fillStyle = ibmDotColor(z);
-            ctx.fillRect(x - DOT_SIZE / 2, y - DOT_SIZE / 2, DOT_SIZE, DOT_SIZE);
+        gCtx.strokeStyle = IBM_BORDER;
+        gCtx.lineWidth = 0.4;
+        gCtx.lineJoin = "round";
+        gCtx.globalAlpha = 0.88;
+        for (const feature of sorted) {
+            gCtx.beginPath();
+            path(feature);
+            gCtx.stroke();
         }
+        gCtx.globalAlpha = 1;
     }
 
-    // Render IBM initiative markers
-    const time = Date.now() * 0.001;
-    for (const initiative of initiatives) {
-        const xyz = lonLatToXYZ([initiative.lon, initiative.lat]);
-        const [x, y, z] = rotateXYZ(xyz, lambda, phi);
+    function fibonacciSphere(n) {
+        const pts = [];
+        const golden = Math.PI * (3 - Math.sqrt(5));
+        for (let i = 0; i < n; i++) {
+            const y = 1 - (i / Math.max(n - 1, 1)) * 2;
+            const r = Math.sqrt(Math.max(0, 1 - y * y));
+            const th = golden * i;
+            const lon = (th * 180 / Math.PI + 180) % 360 - 180;
+            const lat = Math.asin(Math.max(-1, Math.min(1, y))) / DEG2RAD;
+            if (landSet?.has(`${(lon * 2) | 0},${(lat * 2) | 0}`)) continue;
+            pts.push({ xyz: lonLatToXYZ([lon, lat]), kind: "ocean" });
+        }
+        return pts;
+    }
 
-        // Only show front-facing markers
-        if (z < 0) continue;
+    function globeResize() {
+        if (!globeCanvas?.parentElement) return;
+        const rect = globeCanvas.parentElement.getBoundingClientRect();
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        gW = Math.max(rect.width, 320);
+        gH = Math.max(rect.height, 280);
+        gR = Math.min(gW, gH) * 0.42;
+        globeCanvas.width = Math.round(gW * dpr);
+        globeCanvas.height = Math.round(gH * dpr);
+        globeCanvas.style.width = `${gW}px`;
+        globeCanvas.style.height = `${gH}px`;
+        if (gCtx) gCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
 
-        const screenX = cx + x * radius;
-        const screenY = cy - y * radius;
-        const markerSize = 5;
-
-        // Pulsing glow effect
-        const pulse = Math.sin(time * 2 + initiative.lat) * 0.3 + 0.7;
-        ctx.globalAlpha = pulse * 0.4;
-        ctx.fillStyle = initiative.color;
+    function drawDot(ctx, x, y, r, color, alpha) {
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = color;
         ctx.beginPath();
-        ctx.arc(screenX, screenY, markerSize * 2.5, 0, Math.PI * 2);
+        ctx.arc(x, y, r, 0, Math.PI * 2);
         ctx.fill();
+    }
 
-        // Main marker
+    function drawGlobe() {
+        if (!gCtx) return;
 
-        // Mouse hover for markers
-        canvas.addEventListener("mousemove", (e) => {
-            if (dragging) return;
+        gCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        gCtx.globalAlpha = 1;
+        gCtx.globalCompositeOperation = "source-over";
+        gCtx.fillStyle = "#030308";
+        gCtx.fillRect(0, 0, gW, gH);
 
-            const rect = canvas.getBoundingClientRect();
-            const mouseX = e.clientX - rect.left;
-            const mouseY = e.clientY - rect.top;
+        const cx = gW / 2, cy = gH / 2;
 
-            const cx = width / 2;
-            const cy = height / 2;
+        const halo = gCtx.createRadialGradient(cx, cy, gR * 0.05, cx, cy, gR * 1.15);
+        halo.addColorStop(0, "rgba(36, 164, 72, 0.14)");
+        halo.addColorStop(0.4, "rgba(15, 98, 254, 0.1)");
+        halo.addColorStop(0.7, "rgba(69, 137, 255, 0.04)");
+        halo.addColorStop(1, "transparent");
+        gCtx.fillStyle = halo;
+        gCtx.beginPath();
+        gCtx.arc(cx, cy, gR * 1.12, 0, Math.PI * 2);
+        gCtx.fill();
 
-            hoveredMarker = null;
+        if (globeError) {
+            gCtx.fillStyle = "#f4f4f8";
+            gCtx.font = "500 13px IBM Plex Sans, sans-serif";
+            gCtx.textAlign = "center";
+            gCtx.fillText("Globe failed to load", cx, cy - 8);
+            gCtx.fillStyle = "#8b8ca8";
+            gCtx.font = "400 11px IBM Plex Sans, sans-serif";
+            gCtx.fillText(globeError, cx, cy + 12);
+            return;
+        }
 
-            for (const initiative of initiatives) {
-                const xyz = lonLatToXYZ([initiative.lon, initiative.lat]);
-                const [x, y, z] = rotateXYZ(xyz, lambda, phi);
+        if (!globeReady) {
+            gCtx.fillStyle = "rgba(36, 164, 72, 0.08)";
+            gCtx.beginPath();
+            gCtx.arc(cx, cy, gR * 0.9, 0, Math.PI * 2);
+            gCtx.fill();
+            gCtx.fillStyle = "#8b8ca8";
+            gCtx.font = "400 12px IBM Plex Sans, sans-serif";
+            gCtx.textAlign = "center";
+            gCtx.fillText("Loading globe…", cx, cy);
+            return;
+        }
 
-                if (z < 0) continue;
+        const projection = d3.geoOrthographic()
+            .scale(gR * 0.995)
+            .translate([cx, cy])
+            .clipAngle(90)
+            .rotate([(lambda * 180) / Math.PI, (-phi * 180) / Math.PI, 0]);
 
-                const screenX = cx + x * radius;
-                const screenY = cy - y * radius;
-                const distance = Math.sqrt((mouseX - screenX) ** 2 + (mouseY - screenY) ** 2);
+        const path = d3.geoPath(projection, gCtx);
 
-                if (distance < 10) {
-                    hoveredMarker = initiative;
-                    canvas.style.cursor = 'pointer';
-                    showTooltip(e, initiative);
+        gCtx.save();
+        gCtx.beginPath();
+        gCtx.arc(cx, cy, gR, 0, Math.PI * 2);
+        gCtx.clip();
+
+        const buckets = Array.from({ length: BUCKETS }, () => []);
+        for (const p of oceanPoints) {
+            const [x, y, z] = rotateXYZ(p.xyz, lambda, phi);
+            if (z < 0.03) continue;
+            buckets[Math.min(BUCKETS - 1, z * BUCKETS | 0)].push({
+                x: cx + x * gR,
+                y: cy - y * gR,
+                z,
+            });
+        }
+
+        gCtx.globalCompositeOperation = "lighter";
+        for (const bucket of buckets) {
+            for (const { x, y, z } of bucket) {
+                const t = (z + 1) / 2;
+                drawDot(gCtx, x, y, 2.4 + t, "#5ee89a", 0.08 + t * 0.12);
+            }
+        }
+        gCtx.globalCompositeOperation = "source-over";
+        for (const bucket of buckets) {
+            for (const { x, y, z } of bucket) {
+                const t = (z + 1) / 2;
+                drawDot(gCtx, x, y, 1 + t * 0.55, "#2eb872", 0.45 + t * 0.4);
+            }
+        }
+
+        drawLand(gCtx, path, countriesFeatures);
+
+        gCtx.strokeStyle = "rgba(12, 35, 64, 0.55)";
+        gCtx.lineWidth = 1.2;
+        gCtx.beginPath();
+        gCtx.arc(cx, cy, gR, 0, Math.PI * 2);
+        gCtx.stroke();
+
+        gCtx.restore();
+
+        const rim = gCtx.createRadialGradient(cx, cy, gR * 0.82, cx, cy, gR * 1.08);
+        rim.addColorStop(0, "transparent");
+        rim.addColorStop(0.85, "transparent");
+        rim.addColorStop(0.97, "rgba(46, 184, 114, 0.12)");
+        rim.addColorStop(1, "rgba(27, 77, 140, 0.18)");
+        gCtx.fillStyle = rim;
+        gCtx.beginPath();
+        gCtx.arc(cx, cy, gR * 1.06, 0, Math.PI * 2);
+        gCtx.fill();
+
+        const sites = activeFilter === "all"
+            ? IBM_SITES
+            : IBM_SITES.filter((s) => s.type === activeFilter);
+
+        for (const site of sites) {
+            const [x, y, z] = rotateXYZ(lonLatToXYZ([site.lon, site.lat]), lambda, phi);
+            if (z < 0.1) continue;
+            const sx = cx + x * gR, sy = cy - y * gR;
+            const meta = SITE_TYPES[site.type];
+
+            drawDot(gCtx, sx, sy, 8, meta.color, 0.25);
+            drawDot(gCtx, sx, sy, 3.5, "#ffffff", 1);
+            gCtx.strokeStyle = meta.color;
+            gCtx.lineWidth = 1.5;
+            gCtx.stroke();
+
+            if (z > 0.3) {
+                gCtx.font = "600 9px IBM Plex Sans, sans-serif";
+                const label = meta.abbr;
+                const tw = gCtx.measureText(label).width + 8;
+                gCtx.fillStyle = "rgba(8, 6, 18, 0.92)";
+                gCtx.beginPath();
+                gCtx.roundRect(sx + 7, sy - 9, tw, 16, 4);
+                gCtx.fill();
+                gCtx.fillStyle = "#fff";
+                gCtx.textAlign = "center";
+                gCtx.fillText(label, sx + 7 + tw / 2, sy + 2);
+            }
+        }
+
+        gCtx.globalAlpha = 1;
+    }
+
+    function globeTick() {
+        if (autoRotate && !dragging) lambda += 0.00035;
+        drawGlobe();
+        requestAnimationFrame(globeTick);
+    }
+
+    function loadGlobeData() {
+        if (typeof d3 === "undefined") {
+            globeError = "D3 failed to load (check network)";
+            return;
+        }
+        if (typeof topojson === "undefined") {
+            globeError = "TopoJSON failed to load";
+            return;
+        }
+
+        function onWorld(world) {
+            if (!world?.objects?.countries) throw new Error("Invalid map data");
+            const countries = topojson.feature(world, world.objects.countries);
+            countriesFeatures = countries.features;
+            buildLandSet(countries);
+            oceanPoints = fibonacciSphere(OCEAN_COUNT);
+            globeReady = true;
+            globeError = null;
+            globeResize();
+        }
+
+        const mapUrls = ["data/world-110m.json", "./data/world-110m.json",
+            "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json"];
+
+        (async () => {
+            for (const url of mapUrls) {
+                try {
+                    const world = await d3.json(url);
+                    onWorld(world);
                     return;
+                } catch (e) {
+                    console.warn("Map load failed:", url, e);
                 }
             }
+            globeError = "Could not load map data";
+        })();
+    }
 
-            canvas.style.cursor = 'grab';
-            hideTooltip();
+    function initGlobe() {
+        globeCanvas = document.getElementById("globe");
+        if (!globeCanvas) return;
+        gCtx = globeCanvas.getContext("2d", { alpha: false });
+
+        globeResize();
+        window.addEventListener("resize", globeResize);
+        new ResizeObserver(globeResize).observe(globeCanvas.parentElement);
+
+        globeCanvas.addEventListener("pointerdown", (e) => {
+            dragging = true;
+            autoRotate = false;
+            lastX = e.clientX;
+            lastY = e.clientY;
+            globeCanvas.setPointerCapture(e.pointerId);
+        });
+        globeCanvas.addEventListener("pointermove", (e) => {
+            if (!dragging) return;
+            lambda += (e.clientX - lastX) * 0.005;
+            phi = Math.max(-1.1, Math.min(1.1, phi + (e.clientY - lastY) * 0.005));
+            lastX = e.clientX;
+            lastY = e.clientY;
+        });
+        globeCanvas.addEventListener("pointerup", () => { dragging = false; });
+        globeCanvas.addEventListener("dblclick", () => { autoRotate = true; phi = 0.2; });
+
+        requestAnimationFrame(() => {
+            globeResize();
+            globeTick();
+            loadGlobeData();
+        });
+    }
+
+    // ── Focus panel ────────────────────────────────────────────────
+    function setFocus(site) {
+        const meta = SITE_TYPES[site.type];
+        document.getElementById("focus-name").textContent = site.name;
+        document.getElementById("focus-city").textContent = site.city;
+        document.getElementById("focus-type").textContent = meta.label;
+        document.getElementById("focus-icon").textContent = meta.abbr;
+        document.getElementById("focus-icon").style.background =
+            `linear-gradient(135deg, ${meta.color}, #4f70ef)`;
+        document.getElementById("focus-pct").textContent = site.region?.slice(0, 3) || "—";
+        document.querySelector(".ring-fg").style.stroke = meta.color;
+    }
+
+    const FILTERS = [
+        { id: "all", label: "All sites" },
+        { id: "office", label: "Offices" },
+        { id: "client", label: "Clients" },
+        { id: "partner", label: "Dependencies" },
+        { id: "initiative", label: "Initiatives" },
+    ];
+    let filterIdx = 0;
+
+    // ── Charts ─────────────────────────────────────────────────────
+    const ACCENTS = {
+        blue: ["#0043ce", "#0f62fe", "#4589ff"],
+        purple: ["#4f70ef", "#7d17f4", "#b840d3"],
+        teal: ["#0d3d3a", "#2dd4bf", "#5eead4"],
+        orange: ["#8a3800", "#ff832b", "#ffb784"],
+        green: ["#166534", "#24a148", "#4ade80"],
+    };
+
+    function drawSpark(canvas) {
+        const ctx = canvas.getContext("2d");
+        const w = canvas.clientWidth;
+        const h = canvas.clientHeight;
+        if (!w) return;
+        const s = 2;
+        canvas.width = w * s;
+        canvas.height = h * s;
+        ctx.scale(s, s);
+        ctx.clearRect(0, 0, w, h);
+
+        const type = canvas.dataset.chart || "bars";
+        const pal = ACCENTS[canvas.dataset.accent || "purple"];
+        const n = type === "flat" ? 28 : 24;
+        const data = Array.from({ length: n }, (_, i) => {
+            if (type === "flat") return 0.32 + Math.random() * 0.1;
+            if (type === "peak") return 0.25 + Math.sin(i * 0.35) * 0.25 + Math.random() * 0.3;
+            return 0.12 + Math.random() * 0.88;
         });
 
-        canvas.addEventListener("click", (e) => {
-            if (hoveredMarker && !dragging) {
-                showInfoPanel(hoveredMarker);
-            }
+        const barW = (w - 4) / n;
+        data.forEach((v, i) => {
+            const bh = v * (h - 6);
+            const g = ctx.createLinearGradient(0, h, 0, 0);
+            g.addColorStop(0, pal[0]);
+            g.addColorStop(0.5, pal[1]);
+            g.addColorStop(1, pal[2]);
+            ctx.fillStyle = g;
+            ctx.beginPath();
+            ctx.roundRect(2 + i * barW, h - bh, barW - 1.5, bh, [2, 2, 0, 0]);
+            ctx.fill();
+        });
+    }
+
+    function drawRegionChart() {
+        const canvas = document.getElementById("region-chart");
+        if (!canvas) return;
+        const ctx = canvas.getContext("2d");
+        const w = canvas.clientWidth;
+        const h = canvas.height;
+        if (!w) return;
+        canvas.width = w * 2;
+        ctx.scale(2, 2);
+        ctx.clearRect(0, 0, w, h);
+
+        const counts = REGIONS.map((r) => ({
+            offices: IBM_SITES.filter((s) => s.region === r && s.type === "office").length,
+            clients: IBM_SITES.filter((s) => s.region === r && s.type === "client").length,
+            partners: IBM_SITES.filter((s) => s.region === r && s.type === "partner").length,
+        }));
+
+        const barW = w / (REGIONS.length * 4);
+        REGIONS.forEach((_, ri) => {
+            const base = ri * (barW * 4) + 4;
+            [
+                { v: counts[ri].offices, c: "#0f62fe" },
+                { v: counts[ri].clients, c: "#ee5396" },
+                { v: counts[ri].partners, c: "#ff832b" },
+            ].forEach((col, ci) => {
+                const bh = (col.v / 8) * (h - 10);
+                ctx.fillStyle = col.c;
+                ctx.globalAlpha = 0.85;
+                ctx.fillRect(base + ci * barW, h - bh - 4, barW - 2, bh);
+            });
+            ctx.globalAlpha = 1;
+        });
+    }
+
+    function renderActivities() {
+        const ul = document.getElementById("activity-list");
+        if (!ul) return;
+        ul.innerHTML = IBM_ACTIVITIES.map((a) => {
+            const meta = SITE_TYPES[a.type] || SITE_TYPES.office;
+            return `
+            <li class="block-item">
+                <div class="block-icon" style="border-color:${meta.color}55;background:linear-gradient(135deg,${meta.color}33,#1a1630)">${a.icon}</div>
+                <div class="block-fields">
+                    <div class="block-row"><span class="block-label">SITE</span><span class="block-val">${a.name}</span></div>
+                    <div class="block-row"><span class="block-label">LOCATION</span><span class="block-val">${a.location}</span></div>
+                    <div class="block-row"><span class="block-label">TYPE</span><span class="block-val">${meta.label}</span></div>
+                </div>
+                <div class="block-txs">
+                    <span class="block-label">${a.metric.toUpperCase()}</span>
+                    <strong>${a.value}</strong>
+                </div>
+            </li>`;
+        }).join("");
+    }
+
+    function initApp() {
+        initGlobe();
+        setFocus(IBM_SITES[0]);
+
+        document.getElementById("btn-reset")?.addEventListener("click", () => {
+            autoRotate = true;
+            lambda = 0.55;
+            phi = 0.2;
+        });
+        document.getElementById("btn-legend")?.addEventListener("click", () => {
+            const el = document.getElementById("globe-legend");
+            if (el) el.hidden = !el.hidden;
+        });
+        document.getElementById("view-filter")?.addEventListener("click", () => {
+            filterIdx = (filterIdx + 1) % FILTERS.length;
+            activeFilter = FILTERS[filterIdx].id;
+            document.getElementById("view-label").textContent = FILTERS[filterIdx].label;
+        });
+        document.querySelector(".menu-btn")?.addEventListener("click", () => {
+            document.querySelector(".nav-pill")?.classList.toggle("nav-open");
         });
 
-        function showTooltip(e, initiative) {
-            if (!tooltip) {
-                tooltip = document.createElement('div');
-                tooltip.style.position = 'fixed';
-                tooltip.style.background = 'rgba(15, 98, 254, 0.95)';
-                tooltip.style.color = 'white';
-                tooltip.style.padding = '8px 12px';
-                tooltip.style.borderRadius = '4px';
-                tooltip.style.fontSize = '12px';
-                tooltip.style.fontFamily = '"IBM Plex Sans", sans-serif';
-                tooltip.style.pointerEvents = 'none';
-                tooltip.style.zIndex = '1000';
-                tooltip.style.border = '1px solid #4589ff';
-                tooltip.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
-                document.body.appendChild(tooltip);
-            }
+        renderActivities();
+        drawRegionChart();
+        document.querySelectorAll(".spark-chart").forEach(drawSpark);
 
-            tooltip.innerHTML = `<strong>${initiative.name}</strong><br>${initiative.location}`;
-            tooltip.style.left = (e.clientX + 15) + 'px';
-            tooltip.style.top = (e.clientY + 15) + 'px';
-            tooltip.style.display = 'block';
-        }
+        const so = document.getElementById("stat-offices");
+        const sc = document.getElementById("stat-countries");
+        const ss = document.getElementById("stat-sites");
+        if (so) so.textContent = IBM_STATS.offices;
+        if (sc) sc.textContent = IBM_STATS.countries;
+        if (ss) ss.textContent = IBM_STATS.sites;
 
-        function hideTooltip() {
-            if (tooltip) {
-                tooltip.style.display = 'none';
-            }
-        }
+        window.addEventListener("resize", () => {
+            drawRegionChart();
+            document.querySelectorAll(".spark-chart").forEach(drawSpark);
+        });
 
-        function showInfoPanel(initiative) {
-            let panel = document.getElementById('info-panel');
-
-            if (!panel) {
-                panel = document.createElement('div');
-                panel.id = 'info-panel';
-                panel.style.position = 'fixed';
-                panel.style.right = '20px';
-                panel.style.top = '50%';
-                panel.style.transform = 'translateY(-50%)';
-                panel.style.width = '320px';
-                panel.style.maxHeight = '80vh';
-                panel.style.background = 'rgba(38, 38, 38, 0.95)';
-                panel.style.border = '2px solid #0f62fe';
-                panel.style.borderRadius = '8px';
-                panel.style.padding = '20px';
-                panel.style.color = '#f4f4f4';
-                panel.style.fontFamily = '"IBM Plex Sans", sans-serif';
-                panel.style.zIndex = '1001';
-                panel.style.backdropFilter = 'blur(10px)';
-                panel.style.boxShadow = '0 8px 32px rgba(15, 98, 254, 0.3)';
-                panel.style.overflowY = 'auto';
-
-                const closeBtn = document.createElement('button');
-                closeBtn.innerHTML = '×';
-                closeBtn.style.position = 'absolute';
-                closeBtn.style.top = '10px';
-                closeBtn.style.right = '10px';
-                closeBtn.style.background = 'transparent';
-                closeBtn.style.border = 'none';
-                closeBtn.style.color = '#f4f4f4';
-                closeBtn.style.fontSize = '24px';
-                closeBtn.style.cursor = 'pointer';
-                closeBtn.style.width = '30px';
-                closeBtn.style.height = '30px';
-                closeBtn.onclick = () => panel.style.display = 'none';
-
-                panel.appendChild(closeBtn);
-                document.body.appendChild(panel);
-            }
-
-            panel.innerHTML = `
-        <button onclick="this.parentElement.style.display='none'" style="position: absolute; top: 10px; right: 10px; background: transparent; border: none; color: #f4f4f4; font-size: 24px; cursor: pointer; width: 30px; height: 30px;">×</button>
-        <h2 style="color: ${initiative.color}; font-family: 'IBM Plex Mono', monospace; margin-bottom: 15px; font-size: 1.3rem;">${initiative.name}</h2>
-        <p style="margin-bottom: 10px;"><strong>📍 Location:</strong> ${initiative.location}</p>
-        <p style="margin-bottom: 10px;"><strong>🏢 Company:</strong> ${initiative.company}</p>
-        <p style="margin-bottom: 10px;"><strong>📝 Description:</strong> ${initiative.desc}</p>
-        <div style="margin-top: 15px;">
-            <span style="display: inline-block; padding: 5px 12px; background: ${initiative.color}; border-radius: 4px; font-size: 0.85rem; font-family: 'IBM Plex Mono', monospace;">${initiative.type}</span>
-        </div>
-    `;
-
-            panel.style.display = 'block';
-        }
-        ctx.globalAlpha = 1.0;
-        ctx.fillStyle = initiative.color;
-        ctx.beginPath();
-        ctx.arc(screenX, screenY, markerSize, 0, Math.PI * 2);
-        ctx.fill();
-
-        // White border
-        ctx.strokeStyle = "#ffffff";
-        ctx.lineWidth = 2;
-        ctx.stroke();
-
-        // Outer pulse ring
-        ctx.globalAlpha = pulse * 0.6;
-        ctx.beginPath();
-        ctx.arc(screenX, screenY, markerSize * 1.8, 0, Math.PI * 2);
-        ctx.stroke();
-        ctx.globalAlpha = 1.0;
+        setInterval(() => {
+            document.querySelectorAll(".spark-chart").forEach(drawSpark);
+            setFocus(IBM_SITES[(Math.random() * IBM_SITES.length) | 0]);
+        }, 8000);
     }
-}
 
-function tick() {
-    if (autoRotate && !dragging) {
-        lambda += ROTATION_SPEED;
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", initApp);
+    } else {
+        initApp();
     }
-    draw();
-    requestAnimationFrame(tick);
-}
-
-canvas.addEventListener("pointerdown", (e) => {
-    dragging = true;
-    autoRotate = false;
-    lastX = e.clientX;
-    lastY = e.clientY;
-    canvas.setPointerCapture(e.pointerId);
-});
-
-canvas.addEventListener("pointermove", (e) => {
-    if (!dragging) return;
-    const dx = e.clientX - lastX;
-    const dy = e.clientY - lastY;
-    lambda += dx * 0.005;
-    phi = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, phi + dy * 0.005));
-    lastX = e.clientX;
-    lastY = e.clientY;
-});
-
-canvas.addEventListener("pointerup", () => {
-    dragging = false;
-});
-
-canvas.addEventListener("dblclick", () => {
-    autoRotate = true;
-    phi = 0;
-});
-
-resize();
-window.addEventListener("resize", resize);
-new ResizeObserver(resize).observe(canvas);
-tick();
-
-d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json")
-    .then((world) => {
-        const countries = topojson.feature(world, world.objects.countries);
-        points = extractPoints(countries);
-        ready = true;
-        resize();
-    })
-    .catch((err) => {
-        console.error(err);
-        ready = true;
-        ctx.fillStyle = "#4589ff";
-        ctx.font = '14px "IBM Plex Sans", sans-serif';
-        ctx.fillText("Failed to load GeoJSON", 20, 40);
-    });
+})();
