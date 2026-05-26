@@ -1,18 +1,19 @@
 :root {
+    /* IBM Design Language — dark dashboard shell + IBM blue accent */
     --bg: #030308;
     --bg-elevated: #0c0b14;
     --card: rgba(16, 14, 28, 0.92);
-    --card-border: rgba(125, 23, 244, 0.12);
-    --accent: #7d17f4;
-    --accent-2: #4f70ef;
+    --card-border: rgba(15, 98, 254, 0.14);
+    --accent: #0f62fe;
+    --accent-2: #4589ff;
     --accent-teal: #2dd4bf;
     --accent-teal-dim: #0d3d3a;
-    --text: #f4f4f8;
-    --text-muted: #8b8ca8;
-    --text-dim: #5c5d78;
-    --green: #4ade80;
+    --text: #f4f4f4;
+    --text-muted: #a2a9b0;
+    --text-dim: #6f7878;
+    --green: #24a148;
     --green-dim: #166534;
-    --red: #f87171;
+    --red: #fa4d56;
     --nav-pill: rgba(22, 20, 38, 0.85);
     --radius: 14px;
     --radius-lg: 20px;
@@ -21,8 +22,16 @@
     --ibm-pink: #ee5396;
     --ibm-orange: #ff832b;
     --ibm-purple: #8a3ffc;
-    --font: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+    /* Typography: IBM Plex — https://www.ibm.com/design/language/typography/typeface */
+    --font-sans: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
+    --font-serif: "IBM Plex Serif", "Georgia", "Times New Roman", serif;
     --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+    --font: var(--font-sans);
+    --type-display: clamp(1.5rem, 2.5vw, 2rem);
+    --type-title: 1.05rem;
+    --type-body: 0.875rem;
+    --type-caption: 0.75rem;
+    --type-label: 0.625rem;
 }
 
 * {
@@ -36,11 +45,27 @@ html {
 }
 
 body {
-    font-family: var(--font);
+    font-family: var(--font-sans);
+    font-size: var(--type-body);
+    font-weight: 400;
+    line-height: 1.5;
+    letter-spacing: 0.01em;
     background: var(--bg);
     color: var(--text);
     min-height: 100vh;
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-feature-settings: "kern" 1, "liga" 1;
+}
+
+h1,
+h2,
+h3,
+h4 {
+    font-family: var(--font-serif);
+    font-weight: 500;
+    letter-spacing: -0.015em;
+    line-height: 1.25;
 }
 
 .app {
@@ -101,14 +126,24 @@ body {
 .ibm-mark span:nth-child(8) { width: 40%; }
 
 .brand-text {
-    font-size: 0.95rem;
-    font-weight: 600;
+    display: flex;
+    align-items: baseline;
+    gap: 0.35rem;
+    font-size: 1rem;
     letter-spacing: -0.02em;
 }
 
+.brand-ibm {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    color: var(--text);
+}
+
 .brand-sub {
-    color: var(--text-muted);
+    font-family: var(--font-serif);
     font-weight: 500;
+    font-style: italic;
+    color: var(--text);
 }
 
 .nav-pill {
@@ -131,7 +166,8 @@ body {
 .nav-link {
     padding: 0.4rem 1rem;
     border-radius: 999px;
-    font-size: 0.8125rem;
+    font-family: var(--font-sans);
+    font-size: var(--type-caption);
     font-weight: 500;
     color: var(--text-muted);
     text-decoration: none;
@@ -144,7 +180,7 @@ body {
 
 .nav-link.active {
     color: var(--text);
-    background: rgba(125, 23, 244, 0.2);
+    background: rgba(15, 98, 254, 0.18);
 }
 
 .nav-link-filled {
@@ -181,10 +217,16 @@ body {
 }
 
 .network-label {
+    font-family: var(--font-sans);
+    font-size: var(--type-label);
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
     color: var(--text-dim);
 }
 
 .network-value {
+    font-family: var(--font-sans);
     font-weight: 600;
 }
 
@@ -406,17 +448,21 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 700;
-    font-size: 1rem;
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 0.9rem;
 }
 
 .validator-name {
-    font-weight: 600;
-    font-size: 1rem;
+    font-family: var(--font-serif);
+    font-weight: 500;
+    font-size: var(--type-title);
 }
 
 .validator-city {
-    font-size: 0.75rem;
+    font-family: var(--font-sans);
+    font-size: var(--type-caption);
+    font-weight: 400;
     color: var(--text-muted);
 }
 
@@ -479,14 +525,20 @@ body {
 
 .validator-stats strong {
     display: block;
-    font-size: 1.1rem;
-    font-weight: 700;
+    font-family: var(--font-serif);
+    font-size: 1.15rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
 }
 
 .validator-stats span {
-    font-size: 0.65rem;
+    font-family: var(--font-sans);
+    font-size: var(--type-label);
+    font-weight: 500;
     color: var(--text-muted);
     text-transform: lowercase;
+    letter-spacing: 0.02em;
 }
 
 /* ── Dashboard ── */
@@ -672,13 +724,16 @@ body {
 }
 
 .office-preview-hint {
-    font-size: 0.85rem;
+    font-family: var(--font-serif);
+    font-size: var(--type-body);
     color: var(--text-muted);
-    font-weight: 500;
+    font-weight: 400;
+    font-style: italic;
 }
 
 .office-preview-sub {
-    font-size: 0.72rem;
+    font-family: var(--font-sans);
+    font-size: var(--type-caption);
     color: var(--text-dim);
 }
 
@@ -703,7 +758,9 @@ body {
 }
 
 .office-preview-type {
-    font-size: 0.62rem;
+    font-family: var(--font-sans);
+    font-size: var(--type-label);
+    font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.08em;
     color: var(--text-dim);
@@ -711,8 +768,9 @@ body {
 }
 
 .office-preview-name {
-    font-size: 1.05rem;
-    font-weight: 600;
+    font-family: var(--font-serif);
+    font-size: var(--type-title);
+    font-weight: 500;
     line-height: 1.3;
     color: var(--text);
 }
@@ -739,8 +797,9 @@ body {
 }
 
 .office-preview-meta dt {
-    font-size: 0.6rem;
-    font-weight: 600;
+    font-family: var(--font-sans);
+    font-size: var(--type-label);
+    font-weight: 500;
     letter-spacing: 0.06em;
     text-transform: uppercase;
     color: var(--text-dim);
@@ -748,9 +807,11 @@ body {
 
 .office-preview-meta dd {
     margin: 0;
-    font-size: 0.8rem;
+    font-family: var(--font-sans);
+    font-size: var(--type-caption);
+    font-weight: 400;
     color: var(--text);
-    line-height: 1.4;
+    line-height: 1.45;
 }
 
 .footer-link-btn {
@@ -805,17 +866,20 @@ body {
 }
 
 .card-head h3 {
-    font-size: 0.8rem;
+    font-family: var(--font-serif);
+    font-size: var(--type-body);
     font-weight: 500;
-    color: var(--text-muted);
+    color: var(--text);
     display: flex;
     align-items: center;
     gap: 0.35rem;
 }
 
 .card-head h3 .sub {
+    font-family: var(--font-sans);
+    font-size: var(--type-caption);
     font-weight: 400;
-    opacity: 0.7;
+    opacity: 0.75;
 }
 
 .gear-btn {
@@ -829,8 +893,10 @@ body {
 }
 
 .badge {
-    font-size: 0.65rem;
+    font-family: var(--font-sans);
+    font-size: var(--type-label);
     font-weight: 500;
+    letter-spacing: 0.03em;
     padding: 0.2rem 0.5rem;
     border-radius: 6px;
     background: rgba(255, 255, 255, 0.05);
@@ -882,12 +948,16 @@ body {
 }
 
 .region-stat-name {
-    font-weight: 600;
+    font-family: var(--font-serif);
+    font-weight: 500;
+    font-size: var(--type-caption);
     color: var(--text);
-    letter-spacing: 0.02em;
+    letter-spacing: 0.01em;
 }
 
 .region-stat-nums {
+    font-family: var(--font-sans);
+    font-size: var(--type-label);
     color: var(--text-muted);
 }
 
@@ -907,7 +977,9 @@ body {
     background: var(--card);
     border: 1px solid var(--card-border);
     border-radius: 10px;
-    font-size: 0.65rem;
+    font-family: var(--font-sans);
+    font-size: var(--type-label);
+    font-weight: 500;
     color: var(--text-muted);
 }
 
@@ -995,16 +1067,19 @@ body {
 }
 
 .block-label {
+    font-family: var(--font-sans);
     color: var(--text-dim);
-    font-size: 0.6rem;
-    font-weight: 600;
-    letter-spacing: 0.04em;
+    font-size: var(--type-label);
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
     min-width: 76px;
 }
 
 .block-val {
+    font-family: var(--font-sans);
     color: var(--text);
-    font-weight: 500;
+    font-weight: 400;
 }
 
 .block-txs {
@@ -1019,9 +1094,11 @@ body {
 }
 
 .block-txs strong {
+    font-family: var(--font-serif);
     color: var(--text);
-    font-size: 1rem;
-    font-weight: 700;
+    font-size: var(--type-body);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
 }
 
 /* Metric cards */
@@ -1031,25 +1108,29 @@ body {
 }
 
 .metric-value {
-    font-size: 1.85rem;
-    font-weight: 700;
+    font-family: var(--font-serif);
+    font-size: clamp(1.65rem, 2.2vw, 2rem);
+    font-weight: 400;
     letter-spacing: -0.03em;
-    line-height: 1.15;
+    line-height: 1.1;
+    font-variant-numeric: tabular-nums;
     margin-top: auto;
     padding-top: 0.75rem;
 }
 
 .metric-value-lg {
-    font-size: 2rem;
+    font-size: clamp(1.85rem, 2.5vw, 2.25rem);
     margin-top: auto;
     padding-top: 1rem;
 }
 
 .metric-value .unit,
 .metric-value-lg .unit {
-    font-size: 0.9rem;
-    font-weight: 500;
+    font-family: var(--font-sans);
+    font-size: var(--type-caption);
+    font-weight: 400;
     color: var(--text-muted);
+    letter-spacing: 0;
 }
 
 .metric-value-pos {
@@ -1079,17 +1160,20 @@ body {
 }
 
 .bi-label {
-    font-size: 0.6rem;
-    font-weight: 600;
+    font-family: var(--font-sans);
+    font-size: var(--type-label);
+    font-weight: 500;
     letter-spacing: 0.06em;
+    text-transform: uppercase;
     color: var(--text-dim);
 }
 
 .bi-val {
-    font-size: 0.85rem;
-    font-weight: 600;
+    font-family: var(--font-sans);
+    font-size: var(--type-caption);
+    font-weight: 500;
     color: var(--text);
-    line-height: 1.3;
+    line-height: 1.35;
 }
 
 .val-icon {
@@ -1169,19 +1253,33 @@ body {
 }
 
 .footer-tagline {
-    font-size: 0.9rem;
+    font-family: var(--font-sans);
+    font-size: var(--type-body);
     color: var(--text-muted);
     margin-bottom: 0.35rem;
 }
 
 .footer-tagline .hl {
-    color: var(--accent-2);
-    font-weight: 600;
+    font-family: var(--font-serif);
+    color: var(--text);
+    font-weight: 500;
 }
 
 .footer-sub {
-    font-size: 0.75rem;
+    font-family: var(--font-sans);
+    font-size: var(--type-caption);
+    font-weight: 400;
     color: var(--text-dim);
+    line-height: 1.5;
+}
+
+.footer-sub a {
+    color: var(--accent-2);
+    text-decoration: none;
+}
+
+.footer-sub a:hover {
+    text-decoration: underline;
 }
 
 .mascot {
@@ -1191,10 +1289,11 @@ body {
 
 .footer-badge {
     justify-self: center;
-    font-family: var(--font-mono);
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0.12em;
+    font-family: var(--font-serif);
+    font-size: var(--type-caption);
+    font-weight: 500;
+    font-style: italic;
+    letter-spacing: 0.06em;
     color: var(--ibm-blue);
     padding: 0.45rem 0.9rem;
     border-radius: 999px;
