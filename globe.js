@@ -75,15 +75,25 @@
         return canvas.toDataURL("image/png");
     }
 
+    function buildPoints(sites, types) {
+        return sites.map((s) => ({
+            lat: s.lat,
+            lng: s.lon,
+            site: s,
+            color: (types[s.type] || { color: "#0f62fe" }).color,
+            size: s.type === "office" ? 0.28 : 0.22,
+        }));
+    }
+
     function buildRings(sites, types) {
         return sites.map((s) => ({
             lat: s.lat,
             lng: s.lon,
             site: s,
             color: (types[s.type] || { color: "#0f62fe" }).color,
-            maxRadius: 2.4,
+            maxRadius: s.type === "office" ? 2.8 : 2.2,
             propagationSpeed: 1,
-            repeatPeriod: 900,
+            repeatPeriod: s.type === "office" ? 1100 : 900,
         }));
     }
 
@@ -120,12 +130,19 @@
             this._sites = [];
             this._types = {};
             this._filter = "all";
+            this._pov = { lat: 12, lng: -20, altitude: 2.5 };
             this._g = Globe()(container)
                 .backgroundColor("rgba(3, 3, 8, 1)")
                 .showAtmosphere(true)
                 .atmosphereColor("#2eb872")
                 .atmosphereAltitude(0.2)
                 .pointsData([])
+                .pointLat("lat")
+                .pointLng("lng")
+                .pointColor("color")
+                .pointAltitude((d) => d.size >= 0.28 ? 0.02 : 0.012)
+                .pointRadius("size")
+                .pointsMerge(true)
                 .ringsData([])
                 .ringLat("lat")
                 .ringLng("lng")
@@ -147,7 +164,6 @@
             ctrl.autoRotateSpeed = 0.35;
             ctrl.enableDamping = true;
 
-            this._pov = { lat: 12, lng: -20, altitude: 2.5 };
             this._g.pointOfView(this._pov, 0);
 
             const box = container.parentElement || container;
@@ -190,7 +206,31 @@
         }
 
         _updateLayers() {
-            this._g.ringsData(buildRings(this._visibleSites(), this._types));
+            const visible = this._visibleSites();
+            this._g.pointsData(buildPoints(visible, this._types));
+            this._g.ringsData(buildRings(visible, this._types));
+        }
+
+        _focusViewForFilter(filter) {
+            const ctrl = this._g.controls();
+            if (filter === "all") {
+                ctrl.autoRotate = true;
+                this._g.pointOfView(this._pov, 1000);
+                return;
+            }
+
+            const visible = this._visibleSites();
+            if (!visible.length) return;
+
+            const avgLat = visible.reduce((sum, s) => sum + s.lat, 0) / visible.length;
+            const avgLng = visible.reduce((sum, s) => sum + s.lon, 0) / visible.length;
+
+            ctrl.autoRotate = false;
+            this._g.pointOfView({
+                lat: avgLat,
+                lng: avgLng,
+                altitude: filter === "office" ? 1.7 : 1.9,
+            }, 1200);
         }
 
         setSites(sites, types, filter) {
@@ -198,6 +238,7 @@
             this._types = types;
             this._filter = filter;
             this._updateLayers();
+            this._focusViewForFilter(filter);
         }
 
         reset() {
