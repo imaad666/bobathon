@@ -1,10 +1,34 @@
 /** IBM WRLD — offices, clients, dependencies, initiatives */
 
 const SITE_TYPES = {
-    office: { label: "Office", color: "#0f62fe", glow: "rgba(15, 98, 254, 0.9)", abbr: "O" },
-    client: { label: "Client", color: "#ee5396", glow: "rgba(238, 83, 150, 0.9)", abbr: "C" },
-    partner: { label: "Dependency", color: "#ff832b", glow: "rgba(255, 131, 43, 0.9)", abbr: "D" },
-    initiative: { label: "Initiative", color: "#8a3ffc", glow: "rgba(138, 63, 252, 0.9)", abbr: "I" },
+    office: {
+        label: "Office",
+        color: "#0f62fe",
+        markerCore: "#b8d4ff",
+        markerGlow: "rgba(140, 185, 255, 0.5)",
+        abbr: "O",
+    },
+    client: {
+        label: "Client",
+        color: "#ee5396",
+        markerCore: "#f4b8d4",
+        markerGlow: "rgba(240, 160, 200, 0.45)",
+        abbr: "C",
+    },
+    partner: {
+        label: "Dependency",
+        color: "#ff832b",
+        markerCore: "#ffd4a8",
+        markerGlow: "rgba(255, 190, 120, 0.45)",
+        abbr: "D",
+    },
+    initiative: {
+        label: "Initiative",
+        color: "#8a3ffc",
+        markerCore: "#d4c4ff",
+        markerGlow: "rgba(180, 150, 255, 0.45)",
+        abbr: "I",
+    },
 };
 
 const IBM_SITES = [
