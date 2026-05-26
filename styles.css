@@ -215,13 +215,33 @@ body {
 /* ── Hero / Globe ── */
 .hero {
     position: relative;
-    height: min(52vh, 520px);
-    min-height: 320px;
+    height: min(62vh, 600px);
+    min-height: 400px;
     margin-top: var(--header-h);
     overflow: hidden;
+    flex-shrink: 0;
     background:
         radial-gradient(ellipse 80% 50% at 50% 40%, rgba(125, 23, 244, 0.08), transparent),
         var(--bg);
+}
+
+/* Floor reflection under the globe (glow preserved via globe.gl atmosphere) */
+.hero::after {
+    content: "";
+    position: absolute;
+    bottom: 4%;
+    left: 50%;
+    z-index: 1;
+    width: min(72%, 520px);
+    height: 22%;
+    transform: translateX(-50%);
+    background: radial-gradient(
+        ellipse 100% 100% at 50% 0%,
+        rgba(46, 184, 114, 0.14) 0%,
+        rgba(27, 77, 140, 0.06) 45%,
+        transparent 72%
+    );
+    pointer-events: none;
 }
 
 .hero::before {
@@ -246,10 +266,62 @@ body {
     display: block;
     cursor: grab;
     touch-action: none;
+    overflow: hidden;
+}
+
+.globe-canvas canvas {
+    display: block;
+    width: 100% !important;
+    height: 100% !important;
 }
 
 .globe-canvas:active {
     cursor: grabbing;
+}
+
+.globe-loading {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    z-index: 3;
+    transform: translate(-50%, -50%);
+    margin: 0;
+    font-size: 0.75rem;
+    color: var(--text-muted, #8b8ca8);
+    pointer-events: none;
+    transition: opacity 0.25s;
+}
+
+.globe-loading[hidden] {
+    display: none;
+}
+
+.globe-loading--error {
+    color: #ffb4b4;
+}
+
+.file-warn {
+    position: fixed;
+    inset: 0 auto auto 0;
+    z-index: 9999;
+    width: 100%;
+    margin: 0;
+    padding: 0.75rem 1rem;
+    font-size: 0.8125rem;
+    text-align: center;
+    color: #f4f4f8;
+    background: linear-gradient(90deg, #8a1c1c, #5c1010);
+    border-bottom: 1px solid rgba(255, 120, 120, 0.4);
+}
+
+.file-warn code {
+    padding: 0.1rem 0.35rem;
+    border-radius: 4px;
+    background: rgba(0, 0, 0, 0.35);
+}
+
+.file-warn a {
+    color: #7dd3fc;
 }
 
 .hero-floats {
@@ -421,7 +493,7 @@ body {
 .dashboard {
     position: relative;
     z-index: 10;
-    margin-top: -2rem;
+    margin-top: 0;
     padding: 0 0.75rem 1rem;
 }
 
@@ -431,8 +503,8 @@ body {
     padding: 1.25rem;
     background: var(--bg-elevated);
     border: 1px solid var(--card-border);
-    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-    box-shadow: 0 -8px 48px rgba(125, 23, 244, 0.06);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 4px 48px rgba(125, 23, 244, 0.06);
 }
 
 .row-duo {
@@ -544,31 +616,35 @@ body {
     min-height: 160px;
 }
 
-.proposal-legend {
+.region-stats {
+    list-style: none;
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-    font-size: 0.65rem;
-    color: var(--text-dim);
-    margin-bottom: 0.5rem;
+    flex-direction: column;
+    gap: 0.55rem;
+    flex: 1;
+    margin: 0.35rem 0;
 }
 
-.proposal-legend span {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.3rem;
+.region-stat-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    font-size: 0.72rem;
 }
 
-.swatch {
-    width: 8px;
-    height: 8px;
-    border-radius: 2px;
-    display: inline-block;
+.region-stat-name {
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: 0.02em;
 }
 
-.swatch-office { background: var(--ibm-blue); }
-.swatch-client { background: var(--ibm-pink); }
-.swatch-partner { background: var(--ibm-orange); }
+.region-stat-nums {
+    color: var(--text-muted);
+}
+
+.region-num-office { color: var(--ibm-blue); }
+.region-num-client { color: var(--ibm-pink); }
+.region-num-partner { color: var(--ibm-orange); }
 
 .globe-legend {
     position: absolute;
@@ -603,13 +679,6 @@ body {
 .dot-client { background: var(--ibm-pink); box-shadow: 0 0 6px var(--ibm-pink); }
 .dot-partner { background: var(--ibm-orange); box-shadow: 0 0 6px var(--ibm-orange); }
 .dot-initiative { background: var(--ibm-purple); box-shadow: 0 0 6px var(--ibm-purple); }
-
-.proposal-bars {
-    width: 100%;
-    height: 56px;
-    display: block;
-    margin: 0.25rem 0;
-}
 
 .proposal-foot {
     display: flex;
@@ -709,31 +778,22 @@ body {
 /* Metric cards */
 .card-metric {
     position: relative;
-}
-
-.spark-chart {
-    width: 100%;
-    height: 40px;
-    display: block;
-    margin: 0.25rem 0;
-    flex: 1;
-}
-
-.card-tps .spark-chart {
-    height: 48px;
+    min-height: 7rem;
 }
 
 .metric-value {
-    font-size: 1.75rem;
+    font-size: 1.85rem;
     font-weight: 700;
     letter-spacing: -0.03em;
-    line-height: 1.1;
+    line-height: 1.15;
     margin-top: auto;
+    padding-top: 0.75rem;
 }
 
 .metric-value-lg {
     font-size: 2rem;
-    margin-top: 1.5rem;
+    margin-top: auto;
+    padding-top: 1rem;
 }
 
 .metric-value .unit,
