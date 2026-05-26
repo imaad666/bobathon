@@ -1,5 +1,5 @@
 /**
- * IBM Global — globe.gl (stable API only)
+ * IBM WRLD — globe.gl (stable API only)
  */
 (function () {
     const STRIPE_DEG = 5.5;
@@ -76,25 +76,34 @@
     }
 
     function buildPoints(sites, types) {
-        return sites.map((s) => ({
-            lat: s.lat,
-            lng: s.lon,
-            site: s,
-            color: (types[s.type] || { color: "#0f62fe" }).color,
-            size: s.type === "office" ? 0.28 : 0.22,
-        }));
+        return sites.map((s) => {
+            const meta = types[s.type] || { color: "#0f62fe" };
+            const isOffice = s.type === "office";
+            return {
+                lat: s.lat,
+                lng: s.lon,
+                site: s,
+                color: meta.color,
+                /* Larger radius = easier hover hit target on the globe */
+                size: isOffice ? 0.52 : 0.38,
+            };
+        });
     }
 
     function buildRings(sites, types) {
-        return sites.map((s) => ({
-            lat: s.lat,
-            lng: s.lon,
-            site: s,
-            color: (types[s.type] || { color: "#0f62fe" }).color,
-            maxRadius: s.type === "office" ? 2.8 : 2.2,
-            propagationSpeed: 1,
-            repeatPeriod: s.type === "office" ? 1100 : 900,
-        }));
+        return sites.map((s) => {
+            const meta = types[s.type] || { color: "#0f62fe" };
+            const isOffice = s.type === "office";
+            return {
+                lat: s.lat,
+                lng: s.lon,
+                site: s,
+                color: meta.color,
+                maxRadius: isOffice ? 3.4 : 2.4,
+                propagationSpeed: 1,
+                repeatPeriod: isOffice ? 1000 : 900,
+            };
+        });
     }
 
     async function fetchMap() {
@@ -139,15 +148,16 @@
                 .pointsData([])
                 .pointLat("lat")
                 .pointLng("lng")
-                .pointColor("color")
-                .pointAltitude((d) => d.size >= 0.28 ? 0.02 : 0.012)
+                .pointColor((d) => d.color)
+                .pointAltitude((d) => (d.size >= 0.5 ? 0.032 : 0.022))
                 .pointRadius("size")
-                .pointsMerge(true)
+                .pointsMerge(false)
+                .pointsHoverPrecision(0.42)
                 .ringsData([])
                 .ringLat("lat")
                 .ringLng("lng")
-                .ringColor("color")
-                .ringAltitude(0.0015)
+                .ringColor((d) => d.color)
+                .ringAltitude(0.006)
                 .ringResolution(64)
                 .ringMaxRadius("maxRadius")
                 .ringPropagationSpeed("propagationSpeed")
@@ -156,6 +166,25 @@
             if (typeof this._g.onRingClick === "function") {
                 this._g.onRingClick((ring) => {
                     if (ring?.site) this.onSiteFocus(ring.site);
+                });
+            }
+            if (typeof this._g.onPointClick === "function") {
+                this._g.onPointClick((pt) => {
+                    if (pt?.site) this.onSiteFocus(pt.site);
+                });
+            }
+            if (typeof this._g.onPointHover === "function") {
+                this._g.onPointHover((pt) => {
+                    const site = pt?.site || null;
+                    const ctrl = this._g.controls();
+                    if (site) {
+                        ctrl.autoRotate = false;
+                    } else if (this._filter === "all") {
+                        ctrl.autoRotate = true;
+                    }
+                    window.dispatchEvent(
+                        new CustomEvent("ibm-site-hover", { detail: site })
+                    );
                 });
             }
 
@@ -191,6 +220,7 @@
 
                 this._g.globeImageUrl(buildGlobeTexture(land.features, d3g));
                 this._updateLayers();
+                window.dispatchEvent(new Event("ibm-globe-ready"));
 
                 document.getElementById("globe-loading").hidden = true;
             } catch (e) {
@@ -229,7 +259,7 @@
             this._g.pointOfView({
                 lat: avgLat,
                 lng: avgLng,
-                altitude: filter === "office" ? 1.7 : 1.9,
+                altitude: filter === "office" ? 2.05 : 2.15,
             }, 1200);
         }
 

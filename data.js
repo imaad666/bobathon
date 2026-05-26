@@ -1,4 +1,4 @@
-/** IBM global presence — offices, clients, dependencies, initiatives */
+/** IBM WRLD — offices, clients, dependencies, initiatives */
 
 const SITE_TYPES = {
     office: { label: "Office", color: "#0f62fe", glow: "rgba(15, 98, 254, 0.9)", abbr: "O" },

@@ -1,19 +1,31 @@
-/* IBM Global — dashboard UI + WebGL globe hookup */
+/* IBM WRLD — dashboard UI + WebGL globe hookup */
 
 (function () {
     let globe = null;
     let activeFilter = "all";
+    const VIEW_PARAM_MAP = {
+        offices: "office",
+        office: "office",
+        clients: "client",
+        client: "client",
+        partners: "partner",
+        partner: "partner",
+        all: "all",
+    };
 
-    function initGlobe() {
-        if (location.protocol === "file:") {
-            const el = document.getElementById("globe-loading");
-            if (el) {
-                el.hidden = false;
-                el.textContent = "Run ./start.sh then open http://localhost:8766/";
-            }
-            return;
-        }
+    function connectGlobe() {
+        if (location.protocol === "file:") return;
         globe = window.__ibmGlobe || null;
+        if (globe?.setSites) {
+            globe.setSites(IBM_SITES, SITE_TYPES, activeFilter);
+        }
+    }
+
+    function applyFilterFromQuery() {
+        const view = new URLSearchParams(location.search).get("view");
+        if (!view) return;
+        const filter = VIEW_PARAM_MAP[view.toLowerCase()];
+        if (filter) applyFilter(filter);
     }
 
     function setFocus(site) {
@@ -28,6 +40,37 @@
         document.querySelector(".ring-fg").style.stroke = meta.color;
     }
 
+    function renderSitePreview(site) {
+        const el = document.getElementById("office-preview");
+        if (!el) return;
+
+        if (!site) {
+            el.innerHTML = `
+                <div class="office-preview-inner office-preview-empty">
+                    <p class="office-preview-hint">Hover a site on the globe</p>
+                    <p class="office-preview-sub">Details appear here</p>
+                </div>`;
+            return;
+        }
+
+        const meta = SITE_TYPES[site.type] || SITE_TYPES.office;
+        el.innerHTML = `
+            <div class="office-preview-inner">
+                <div class="office-preview-top">
+                    <div class="office-preview-avatar" style="background:linear-gradient(135deg,${meta.color},#4f70ef)">${meta.abbr}</div>
+                    <div>
+                        <p class="office-preview-type">${meta.label}</p>
+                        <h4 class="office-preview-name">${site.name}</h4>
+                    </div>
+                </div>
+                <dl class="office-preview-meta">
+                    <div><dt>Location</dt><dd>${site.city}</dd></div>
+                    <div><dt>Region</dt><dd>${site.region || "—"}</dd></div>
+                    ${site.source ? `<div><dt>Source</dt><dd>${site.source}</dd></div>` : ""}
+                </dl>
+            </div>`;
+    }
+
     const FILTERS = [
         { id: "all", label: "All sites" },
         { id: "office", label: "Offices" },
@@ -38,14 +81,8 @@
     let filterIdx = 0;
 
     function setActiveNav(filter) {
-        document.querySelectorAll(".nav-link").forEach((link) => {
-            const href = link.getAttribute("href");
-            const isActive =
-                (filter === "all" && href === "/") ||
-                (filter === "office" && href === "#offices") ||
-                (filter === "client" && href === "#clients") ||
-                (filter === "partner" && href === "#partners");
-            link.classList.toggle("active", isActive);
+        document.querySelectorAll(".nav-link[data-filter]").forEach((link) => {
+            link.classList.toggle("active", link.dataset.filter === filter);
         });
     }
 
@@ -55,7 +92,23 @@
         filterIdx = nextIdx >= 0 ? nextIdx : 0;
         document.getElementById("view-label").textContent = FILTERS[filterIdx].label;
         setActiveNav(activeFilter);
-        if (globe?.setSites) globe.setSites(IBM_SITES, SITE_TYPES, activeFilter);
+        connectGlobe();
+    }
+
+    function bindFilterControls() {
+        document.querySelectorAll("[data-filter]").forEach((el) => {
+            el.addEventListener("click", (e) => {
+                e.preventDefault();
+                applyFilter(el.dataset.filter);
+                const url = new URL(location.href);
+                if (el.dataset.filter === "all") {
+                    url.searchParams.delete("view");
+                } else {
+                    url.searchParams.set("view", el.dataset.filter);
+                }
+                history.replaceState(null, "", url.pathname + url.search);
+            });
+        });
     }
 
     function renderRegionStats() {
@@ -75,29 +128,6 @@
                 </span>
             </li>`;
         }).join("");
-    }
-
-    function renderOfficeList() {
-        const el = document.getElementById("office-list");
-        if (!el) return;
-        const offices = IBM_SITES
-            .filter((site) => site.type === "office")
-            .sort((a, b) => a.region.localeCompare(b.region) || a.name.localeCompare(b.name));
-
-        el.innerHTML = offices.map((site) => `
-            <li class="block-item" data-office-name="${site.name}">
-                <div class="block-icon" style="border-color:${SITE_TYPES.office.color}55;background:linear-gradient(135deg,${SITE_TYPES.office.color}33,#1a1630)">O</div>
-                <div class="block-fields">
-                    <div class="block-row"><span class="block-label">OFFICE</span><span class="block-val">${site.name}</span></div>
-                    <div class="block-row"><span class="block-label">LOCATION</span><span class="block-val">${site.city}</span></div>
-                    <div class="block-row"><span class="block-label">REGION</span><span class="block-val">${site.region}</span></div>
-                </div>
-                <div class="block-txs">
-                    <span class="block-label">SOURCE</span>
-                    <strong>${site.source || "IBM"}</strong>
-                </div>
-            </li>
-        `).join("");
     }
 
     function renderActivities() {
@@ -122,9 +152,16 @@
     }
 
     function initApp() {
-        setFocus(IBM_SITES[0]);
+        if (IBM_SITES.length) setFocus(IBM_SITES[0]);
         setActiveNav(activeFilter);
-        window.addEventListener("ibm-site-focus", (e) => setFocus(e.detail));
+        window.addEventListener("ibm-site-focus", (e) => {
+            setFocus(e.detail);
+            renderSitePreview(e.detail);
+        });
+        window.addEventListener("ibm-site-hover", (e) => {
+            renderSitePreview(e.detail);
+            document.getElementById("globe")?.classList.toggle("globe-hovering", !!e.detail);
+        });
 
         document.getElementById("btn-reset")?.addEventListener("click", () => globe?.reset());
         document.getElementById("btn-legend")?.addEventListener("click", () => {
@@ -136,23 +173,7 @@
             applyFilter(next.id);
         });
 
-        document.querySelector('a[href="/"]')?.addEventListener("click", (e) => {
-            e.preventDefault();
-            applyFilter("all");
-        });
-        document.querySelector('a[href="#offices"]')?.addEventListener("click", (e) => {
-            e.preventDefault();
-            applyFilter("office");
-            document.getElementById("offices")?.scrollIntoView({ behavior: "smooth", block: "start" });
-        });
-        document.querySelector('a[href="#clients"]')?.addEventListener("click", (e) => {
-            e.preventDefault();
-            applyFilter("client");
-        });
-        document.querySelector('a[href="#partners"]')?.addEventListener("click", (e) => {
-            e.preventDefault();
-            applyFilter("partner");
-        });
+        bindFilterControls();
 
         document.querySelector(".menu-btn")?.addEventListener("click", () => {
             document.querySelector(".nav-pill")?.classList.toggle("nav-open");
@@ -160,7 +181,7 @@
 
         renderActivities();
         renderRegionStats();
-        renderOfficeList();
+        renderSitePreview(null);
 
         const so = document.getElementById("stat-offices");
         const sc = document.getElementById("stat-countries");
@@ -168,19 +189,25 @@
         if (so) so.textContent = IBM_STATS.offices;
         if (sc) sc.textContent = IBM_STATS.countries;
         if (ss) ss.textContent = IBM_STATS.sites;
+    }
 
-        setInterval(() => {
-            const pool = activeFilter === "all"
-                ? IBM_SITES
-                : IBM_SITES.filter((site) => site.type === activeFilter);
-            if (!pool.length) return;
-            setFocus(pool[(Math.random() * pool.length) | 0]);
-        }, 8000);
+    /** Strip legacy office list if an old cached index.html is still served */
+    function removeLegacyOfficeList() {
+        document.getElementById("offices-section")?.remove();
+        document.querySelector(".offices-row")?.remove();
+        const list = document.getElementById("office-list");
+        if (list) {
+            list.closest("article")?.remove();
+            list.remove();
+        }
+        document.querySelectorAll(".offices-list-card").forEach((el) => el.remove());
     }
 
     function boot() {
-        initGlobe();
+        removeLegacyOfficeList();
         initApp();
+        applyFilterFromQuery();
+        connectGlobe();
     }
 
     if (document.readyState === "loading") {
@@ -189,8 +216,6 @@
         boot();
     }
 
-    window.addEventListener("ibm-globe-inited", () => {
-        globe = window.__ibmGlobe;
-        applyFilter(activeFilter);
-    });
+    window.addEventListener("ibm-globe-inited", connectGlobe);
+    window.addEventListener("ibm-globe-ready", connectGlobe);
 })();

@@ -21,7 +21,7 @@ fi
 
 for PORT in 8766 8767 8768 3000; do
   if ! lsof -i ":$PORT" >/dev/null 2>&1; then
-    echo "IBM Global → http://localhost:${PORT}/"
+    echo "IBM WRLD → http://localhost:${PORT}/"
     echo "Press Ctrl+C to stop."
     exec "$PYTHON_BIN" -m http.server "$PORT"
   fi
