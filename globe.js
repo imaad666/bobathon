@@ -451,8 +451,10 @@
                 }
                 const pov = this._g.pointOfView?.();
                 const alt = typeof pov?.altitude === "number" ? pov.altitude : 2.5;
+                const isMobile = window.matchMedia("(max-width: 767px)").matches;
+                const moonFadeAltitude = isMobile ? 2.18 : 1.92;
                 /* Only hide mini-moon when Earth is zoomed in close (manual scroll), not on filter presets */
-                hero.classList.toggle("earth-zoomed", alt < 1.92);
+                hero.classList.toggle("earth-zoomed", alt < moonFadeAltitude);
             };
 
             sync();

@@ -1412,12 +1412,70 @@ h4 {
 
 /* Hero layout on narrow screens — keep moon clear of preview */
 @media (max-width: 767px) {
+    .moon-wrap {
+        top: 6%;
+        right: 5%;
+        width: 88px;
+        height: 88px;
+        min-width: 88px;
+        min-height: 88px;
+        max-width: 88px;
+        max-height: 88px;
+    }
+
+    .moon-dock {
+        width: 88px;
+        height: 88px;
+        min-width: 88px;
+        min-height: 88px;
+        max-width: 88px;
+        max-height: 88px;
+    }
+
+    .moon-canvas {
+        width: 88px !important;
+        height: 88px !important;
+        min-width: 88px !important;
+        min-height: 88px !important;
+        max-width: 88px !important;
+        max-height: 88px !important;
+    }
+
+    .moon-canvas canvas {
+        width: 88px !important;
+        height: 88px !important;
+        min-width: 88px !important;
+        min-height: 88px !important;
+        max-width: 88px !important;
+        max-height: 88px !important;
+    }
+
+    .office-preview-hero {
+        width: min(340px, calc(100vw - 1rem));
+        right: auto;
+        left: 50%;
+        bottom: 2.9rem;
+        transform: translateX(-50%);
+    }
+
     .office-preview-inner {
-        min-height: 200px;
+        min-height: 96px;
+        max-height: 22vh;
+        overflow: auto;
+        padding: 0.5rem 0.72rem;
     }
 
     .office-preview-hint {
         font-size: 0.9rem;
+    }
+
+    .office-preview-meta {
+        gap: 0.28rem;
+    }
+
+    .office-preview-meta div {
+        grid-template-columns: 58px 1fr;
+        padding-top: 0.26rem;
     }
 
 }
