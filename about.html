@@ -51,7 +51,7 @@
             max-width: 60ch;
         }
 
-        .about-copy + .about-copy {
+        .about-copy+.about-copy {
             margin-top: 1rem;
         }
 
@@ -67,6 +67,29 @@
         .about-back:hover {
             text-decoration: underline;
         }
+
+        .about-specs-title {
+            margin-top: clamp(1.4rem, 2.8vw, 2.2rem);
+            margin-bottom: 0.6rem;
+            font-family: var(--font-serif);
+            font-size: clamp(1.2rem, 2.2vw, 1.9rem);
+            color: var(--text);
+        }
+
+        .about-specs {
+            margin: 0;
+            padding-left: 1.1rem;
+            max-width: 70ch;
+            display: grid;
+            gap: 0.4rem;
+        }
+
+        .about-specs li {
+            font-family: var(--font-sans);
+            font-size: clamp(0.95rem, 1.2vw, 1.08rem);
+            line-height: 1.55;
+            color: var(--text-muted);
+        }
     </style>
 </head>
 
@@ -81,13 +104,23 @@
             <section class="about-card">
                 <h1 class="about-title">About this project</h1>
                 <p class="about-copy">
-                    This IBM project was built by Imaad Irshad.
+                    This IBM project was built by Imaad with Krishna & Yashwanth.
                 </p>
                 <p class="about-copy">
-                    Notes: IBM is something that has been part of all technical advancements and driven the evolution,
+                    IBM is something that has been part of all technical advancements and driven the evolution,
                     every time, all throughout the world and even beyond. My attempt was to make it visual, which I
                     built for this ICA Bobathon of 2026. My first IBM Hackathon of the many many more to come. Hope you
                     like it, this is me trying to actually see the <em>Impact</em>, from a farther lens.
+                    This project is a static web application built using HTML5, CSS3, and vanilla JavaScript. It
+                    leverages globe.gl for 3D Earth and Moon rendering, along with D3.js and TopoJSON to handle map
+                    geometry and country projections. The geographic base comes from Natural Earth world data (via
+                    world-atlas), complemented by custom IBM-themed textures for visual identity. Responsive design was
+                    implemented for desktop, tablet, and mobile, featuring distinct hover-card and moon positioning
+                    rules for each breakpoint. An Apollo 11 moon point experience was integrated, with an IBM Apollo
+                    history link and synchronized moon fade effect when zooming on Earth. IBM bob provided assistance
+                    and decision support throughout the code development process.
+
+
                 </p>
                 <a class="about-back" href="index.html">/back</a>
             </section>

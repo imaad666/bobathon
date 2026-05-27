@@ -779,6 +779,32 @@ h4 {
     }
 }
 
+@media (min-width: 768px) and (max-width: 1023px) {
+    .office-preview-hero {
+        width: min(420px, calc(100vw - 2.25rem));
+        left: 50%;
+        right: auto;
+        bottom: 4.1rem;
+        transform: translateX(-50%);
+    }
+
+    .office-preview-inner {
+        min-height: 132px;
+        max-height: 28vh;
+        padding: 0.75rem 0.95rem;
+        overflow: auto;
+    }
+
+    .office-preview-meta {
+        gap: 0.4rem;
+    }
+
+    .office-preview-meta div {
+        grid-template-columns: 66px 1fr;
+        padding-top: 0.34rem;
+    }
+}
+
 @media (min-width: 1024px) {
     .office-preview-hero {
         top: auto;
