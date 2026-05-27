@@ -4,29 +4,29 @@ const SITE_TYPES = {
     office: {
         label: "Office",
         color: "#0f62fe",
-        markerCore: "#b8d4ff",
-        markerGlow: "rgba(140, 185, 255, 0.5)",
+        markerCore: "#4da3ff",
+        markerGlow: "rgba(77, 163, 255, 0.65)",
         abbr: "O",
     },
     client: {
         label: "Client",
         color: "#ee5396",
-        markerCore: "#f4b8d4",
-        markerGlow: "rgba(240, 160, 200, 0.45)",
+        markerCore: "#ff6eb4",
+        markerGlow: "rgba(255, 110, 180, 0.6)",
         abbr: "C",
     },
     partner: {
         label: "Dependency",
         color: "#ff832b",
-        markerCore: "#ffd4a8",
-        markerGlow: "rgba(255, 190, 120, 0.45)",
+        markerCore: "#ffab4d",
+        markerGlow: "rgba(255, 171, 77, 0.6)",
         abbr: "D",
     },
     initiative: {
         label: "Initiative",
         color: "#8a3ffc",
-        markerCore: "#d4c4ff",
-        markerGlow: "rgba(180, 150, 255, 0.45)",
+        markerCore: "#b47aff",
+        markerGlow: "rgba(180, 122, 255, 0.65)",
         abbr: "I",
     },
 };
@@ -222,6 +222,7 @@ const IBM_SITES = [
     { id: "client-allianz", lon: 11.5604, lat: 48.1371, type: "client", name: "Allianz", city: "Munich, Bavaria, Germany", region: "EMEA", source: "IBM Case Study" },
     { id: "client-att", lon: -96.8085, lat: 32.7904, type: "client", name: "AT&T", city: "Dallas, Texas, United States", region: "Americas", source: "IBM Case Study" },
     { id: "client-hsbc", lon: -0.0850, lat: 51.5130, type: "client", name: "HSBC", city: "London, England, United Kingdom", region: "EMEA", source: "IBM Case Study" },
+    { id: "client-elevance-health", lon: -86.1528, lat: 39.7645, type: "client", name: "Elevance Health", city: "Indianapolis, Indiana, United States", region: "Americas", source: "IBM Consulting (watsonx Assistant)" },
     { id: "initiative-anderon", lon: -73.8237, lat: 42.6880, type: "initiative", name: "Anderon Quantum Foundry", city: "Albany, New York, United States", region: "Americas", source: "IBM Spinoff" },
     { id: "initiative-quantum-omaha", lon: -95.9345, lat: 41.2565, type: "initiative", name: "IBM Quantum Network — Omaha", city: "Omaha, Nebraska, United States", region: "Americas", source: "IBM Quantum" },
     { id: "initiative-quantum-munich", lon: 11.5820, lat: 48.1351, type: "initiative", name: "IBM Quantum Network — Munich", city: "Munich, Bavaria, Germany", region: "EMEA", source: "IBM Quantum" },
@@ -260,16 +261,16 @@ const IBM_SITES = [
 const REGIONS = ["Americas", "EMEA", "APAC"];
 
 const IBM_ACTIVITIES = [
-    { icon: "O", type: "office", name: "Gatineau CIC", location: "Quebec, Canada", metric: "Cloud hub", value: "Active" },
-    { icon: "C", type: "client", name: "JPMorgan Chase", location: "New York", metric: "Contract", value: "Renewed" },
-    { icon: "D", type: "partner", name: "Confluent", location: "Mountain View", metric: "Acquired", value: "2026" },
-    { icon: "I", type: "initiative", name: "Anderon Foundry", location: "Albany, NY", metric: "CHIPS", value: "$2B" },
+    { type: "office", name: "Gatineau CIC", location: "Quebec, Canada", metric: "Cloud hub", value: "Active" },
+    { type: "client", name: "JPMorgan Chase", location: "New York", metric: "Contract", value: "Renewed" },
+    { type: "partner", name: "Confluent", location: "Mountain View", metric: "Acquired", value: "2026" },
+    { type: "initiative", name: "Anderon Foundry", location: "Albany, NY", metric: "CHIPS", value: "$2B" },
 ];
 
 const IBM_STATS = {
     offices: "169",
     countries: "170+",
-    sites: "221",
+    sites: "222",
     cloudRegions: 34,
     labs: 12,
     employees: "~288K",

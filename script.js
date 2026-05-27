@@ -59,7 +59,7 @@
                 <div class="office-preview-top">
                     <div class="office-preview-avatar" style="background:linear-gradient(135deg,${meta.color},#4f70ef)">${meta.abbr}</div>
                     <div>
-                        <p class="office-preview-type">${meta.label}</p>
+                        <p class="office-preview-type" style="color:${meta.markerCore}">${meta.label}</p>
                         <h4 class="office-preview-name">${site.name}</h4>
                     </div>
                 </div>
@@ -68,6 +68,7 @@
                     <div><dt>Region</dt><dd>${site.region || "—"}</dd></div>
                     ${site.source ? `<div><dt>Source</dt><dd>${site.source}</dd></div>` : ""}
                 </dl>
+                ${site.url ? `<p class="office-preview-link"><a href="${site.url}" target="_blank" rel="noopener noreferrer" style="color:${meta.markerCore}">IBM &amp; Apollo — read the story</a></p>` : ""}
             </div>`;
     }
 
@@ -91,6 +92,8 @@
         activeFilter = nextIdx >= 0 ? FILTERS[nextIdx].id : "all";
         filterIdx = nextIdx >= 0 ? nextIdx : 0;
         document.getElementById("view-label").textContent = FILTERS[filterIdx].label;
+        // If user changes view while in moon mode, go back to Earth globe.
+        window.__ibmSetMoonMode?.(false);
         setActiveNav(activeFilter);
         connectGlobe();
     }
@@ -109,6 +112,17 @@
                 history.replaceState(null, "", url.pathname + url.search);
             });
         });
+    }
+
+    function renderDashboardLegend() {
+        const el = document.getElementById("dashboard-legend");
+        if (!el || typeof SITE_TYPES === "undefined") return;
+        el.innerHTML = Object.entries(SITE_TYPES)
+            .map(
+                ([key, meta]) =>
+                    `<span class="dashboard-legend-item"><span class="dot dot-${key}" style="background:${meta.markerCore};box-shadow:0 0 8px ${meta.markerGlow}" aria-hidden="true"></span>${meta.label}</span>`
+            )
+            .join("");
     }
 
     function renderRegionStats() {
@@ -136,8 +150,7 @@
         ul.innerHTML = IBM_ACTIVITIES.map((a) => {
             const meta = SITE_TYPES[a.type] || SITE_TYPES.office;
             return `
-            <li class="block-item">
-                <div class="block-icon" style="border-color:${meta.color}55;background:linear-gradient(135deg,${meta.color}33,#1a1630)">${a.icon}</div>
+            <li class="block-item" style="--block-accent:${meta.color}">
                 <div class="block-fields">
                     <div class="block-row"><span class="block-label">SITE</span><span class="block-val">${a.name}</span></div>
                     <div class="block-row"><span class="block-label">LOCATION</span><span class="block-val">${a.location}</span></div>
@@ -152,6 +165,7 @@
     }
 
     function initApp() {
+        renderDashboardLegend();
         if (IBM_SITES.length) setFocus(IBM_SITES[0]);
         setActiveNav(activeFilter);
         window.addEventListener("ibm-site-focus", (e) => {
@@ -164,6 +178,9 @@
         });
 
         document.getElementById("btn-reset")?.addEventListener("click", () => globe?.reset());
+        document.getElementById("btn-reset")?.addEventListener("click", () => {
+            window.__ibmSetMoonMode?.(false);
+        });
         document.getElementById("btn-legend")?.addEventListener("click", () => {
             const el = document.getElementById("globe-legend");
             if (el) el.hidden = !el.hidden;
