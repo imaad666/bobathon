@@ -166,6 +166,9 @@
     const MOON_BUMP_URL = "data/lunar_bumpmap.jpg";
     const MOON_SKY_URL = "data/night-sky.png";
     const APOLLO_ARTICLE_URL = "https://www.ibm.com/history/apollo";
+    const MOON_DOCK_PX = 132;
+    const MOON_DOCK_POV_ALT = 2.08;
+    const APOLLO_MARKER_BLUE = "#00c2ff";
 
     function buildMoonTexture() {
         // Offline fallback only — prefer bundled NASA-style maps in data/.
@@ -277,6 +280,18 @@
         el.classList.toggle("globe-loading--error", !!err);
     }
 
+    /** Let hero starfield show through empty sky pixels */
+    function enableTransparentSky(g) {
+        const renderer = g.renderer?.();
+        if (renderer) {
+            renderer.alpha = true;
+            renderer.setClearColor(0x000000, 0);
+            if (renderer.domElement) renderer.domElement.style.background = "transparent";
+        }
+        const scene = g.scene?.();
+        if (scene) scene.background = null;
+    }
+
     class IBMGlobe {
         constructor(container, options = {}) {
             if (typeof Globe !== "function") throw new Error("globe.gl not loaded");
@@ -287,7 +302,7 @@
             this._filter = "all";
             this._pov = { lat: 12, lng: -20, altitude: 2.5 };
             this._g = Globe()(container)
-                .backgroundColor("rgba(3, 3, 8, 1)")
+                .backgroundColor("rgba(3, 3, 8, 0)")
                 .showAtmosphere(true)
                 .atmosphereColor("rgba(125, 23, 244, 0.28)")
                 .atmosphereAltitude(0.18)
@@ -296,6 +311,7 @@
             wirePointLayer(this._g);
             wireRingLayer(this._g);
             applyGlobeTransitions(this._g);
+            enableTransparentSky(this._g);
 
             if (typeof this._g.onRingClick === "function") {
                 this._g.onRingClick((ring) => {
@@ -358,6 +374,7 @@
 
                 this._g.globeImageUrl(buildGlobeTexture(land.features, d3g));
                 this._updateLayers();
+                enableTransparentSky(this._g);
                 window.dispatchEvent(new Event("ibm-globe-ready"));
 
                 document.getElementById("globe-loading").hidden = true;
@@ -423,7 +440,6 @@
 
             const sync = () => {
                 if (hero.classList.contains("moon-active")) {
-                    hero.classList.remove("earth-zoomed");
                     return;
                 }
                 const pov = this._g.pointOfView?.();
@@ -487,47 +503,50 @@
 
         const hero = document.querySelector(".hero");
         const moonEl = document.getElementById("moon");
-        let moonActive = false;
 
-        function setMoonMode(on) {
-            moonActive = !!on;
-            if (hero) hero.classList.toggle("moon-active", moonActive);
-            if (moonActive) {
-                window.__ibmGlobe?.pause?.();
-                moonGlobe?.focusLanding?.(false, false);
-            } else {
-                moonGlobe?.focusLanding?.(false, true);
-                window.__ibmGlobe?.resume?.();
-                window.__ibmGlobe?.focusForCurrentFilter?.();
-            }
-        }
-
-        // Allow the rest of the UI to exit moon mode (filters, reset, etc.).
-        window.__ibmSetMoonMode = setMoonMode;
+        /* Mini moon stays fixed size — no fullscreen “moon mode” layout toggle */
+        window.__ibmSetMoonMode = () => {
+            hero?.classList.remove("moon-active");
+        };
 
         const apolloSiteRecord = {
             lon: APOLLO_11.lng,
             lat: APOLLO_11.lat,
             type: "initiative",
+            core: APOLLO_MARKER_BLUE,
             ...moonSite,
         };
 
         class MoonGlobe {
             constructor(container) {
                 this._g = Globe()(container)
-                    .backgroundColor("rgba(3, 3, 8, 1)")
-                    .showAtmosphere(true)
-                    .atmosphereColor("rgba(180, 175, 200, 0.14)")
-                    .atmosphereAltitude(0.1)
+                    .backgroundColor("rgba(0, 0, 0, 0)")
+                    .showAtmosphere(false)
                     .globeImageUrl(MOON_SURFACE_URL)
-                    .bumpImageUrl(MOON_BUMP_URL)
-                    .backgroundImageUrl(MOON_SKY_URL);
+                    .bumpImageUrl(MOON_BUMP_URL);
                 wirePointLayer(this._g);
                 wireRingLayer(this._g);
                 applyGlobeTransitions(this._g);
                 this._g
-                    .pointsData(buildPoints([apolloSiteRecord], SITE_TYPES, true, 2.4))
-                    .ringsData(buildRings([apolloSiteRecord], SITE_TYPES));
+                    .pointsData([{
+                        lat: APOLLO_11.lat,
+                        lng: APOLLO_11.lng,
+                        site: moonSite,
+                        type: "initiative",
+                        core: APOLLO_MARKER_BLUE,
+                        glow: "rgba(0, 194, 255, 0.72)",
+                        r: 0.62,
+                    }])
+                    .ringsData([{
+                        lat: APOLLO_11.lat,
+                        lng: APOLLO_11.lng,
+                        site: moonSite,
+                        core: APOLLO_MARKER_BLUE,
+                        glow: "rgba(0, 194, 255, 0.72)",
+                        maxRadius: 1.7,
+                        propagationSpeed: 0.42,
+                        repeatPeriod: 1900,
+                    }]);
 
                 const probe = new Image();
                 probe.onerror = () => this._g.globeImageUrl(buildMoonTexture());
@@ -535,23 +554,18 @@
 
                 const ctrl = this._g.controls();
                 ctrl.autoRotate = true;
-                configureSmoothControls(ctrl, { autoRotateSpeed: 0.14 });
+                ctrl.enableZoom = false;
+                configureSmoothControls(ctrl, { autoRotateSpeed: 0.36 });
+                ctrl.autoRotateSpeed = 0.36;
 
-                this.focusLanding(true, true);
-
-                const box = container.closest(".moon-dock") || container.parentElement || container;
-                const fit = () => {
-                    const w = box.clientWidth;
-                    const h = box.clientHeight;
-                    if (w > 0 && h > 0) this._g.width(w).height(h);
-                };
-                fit();
-                new ResizeObserver(fit).observe(box);
-                window.addEventListener("resize", fit);
+                this._g.width(MOON_DOCK_PX).height(MOON_DOCK_PX);
+                enableTransparentSky(this._g);
+                this.focusLanding(true);
 
                 if (typeof this._g.onPointClick === "function") {
                     this._g.onPointClick((pt) => {
                         if (!pt?.site) return;
+                        this.focusLanding(true);
                         window.dispatchEvent(
                             new CustomEvent("ibm-site-focus", { detail: pt.site })
                         );
@@ -559,7 +573,12 @@
                 }
 
                 if (typeof this._g.onGlobeClick === "function") {
-                    this._g.onGlobeClick(() => setMoonMode(!moonActive));
+                    this._g.onGlobeClick(() => {
+                        this.focusLanding(true);
+                        window.dispatchEvent(
+                            new CustomEvent("ibm-site-focus", { detail: moonSite })
+                        );
+                    });
                 }
 
                 if (typeof this._g.onPointHover === "function") {
@@ -571,24 +590,20 @@
                 }
             }
 
-            focusLanding(skipAnim = false, miniDock = true) {
+            focusLanding(skipAnim = false) {
                 const ctrl = this._g.controls();
-                ctrl.autoRotate = miniDock;
-                const alt = miniDock ? 2.08 : 1.35;
+                ctrl.autoRotate = true;
                 this._g.pointOfView(
-                    { lat: APOLLO_11.lat, lng: APOLLO_11.lng, altitude: alt },
-                    skipAnim ? 0 : 1200
+                    { lat: APOLLO_11.lat, lng: APOLLO_11.lng, altitude: MOON_DOCK_POV_ALT },
+                    skipAnim ? 0 : 0
                 );
-                // Resume a touch of auto-rotate after switching modes.
-                if (moonActive) {
-                    setTimeout(() => {
-                        const c = this._g.controls();
-                        if (c) {
-                            c.autoRotate = true;
-                            c.autoRotateSpeed = 0.22;
-                        }
-                    }, 900);
-                }
+                setTimeout(() => {
+                    const c = this._g.controls();
+                    if (c) {
+                        c.autoRotate = true;
+                        c.autoRotateSpeed = 0.36;
+                    }
+                }, 0);
             }
         }
 

@@ -177,24 +177,7 @@
             document.getElementById("globe")?.classList.toggle("globe-hovering", !!e.detail);
         });
 
-        document.getElementById("btn-reset")?.addEventListener("click", () => globe?.reset());
-        document.getElementById("btn-reset")?.addEventListener("click", () => {
-            window.__ibmSetMoonMode?.(false);
-        });
-        document.getElementById("btn-legend")?.addEventListener("click", () => {
-            const el = document.getElementById("globe-legend");
-            if (el) el.hidden = !el.hidden;
-        });
-        document.getElementById("view-filter")?.addEventListener("click", () => {
-            const next = FILTERS[(filterIdx + 1) % FILTERS.length];
-            applyFilter(next.id);
-        });
-
         bindFilterControls();
-
-        document.querySelector(".menu-btn")?.addEventListener("click", () => {
-            document.querySelector(".nav-pill")?.classList.toggle("nav-open");
-        });
 
         renderActivities();
         renderRegionStats();

@@ -286,49 +286,48 @@ h4 {
     pointer-events: none;
 }
 
-/* Subtle twinkling starfield behind the globes */
+/* Starfield — behind Earth; sky shows through transparent WebGL clear */
 .hero-stars {
     position: absolute;
     inset: 0;
     z-index: 0;
     pointer-events: none;
     overflow: hidden;
+    background:
+        url("data/night-sky.png") center / cover no-repeat,
+        radial-gradient(ellipse 120% 80% at 50% 40%, rgba(40, 20, 70, 0.35), transparent 70%);
+    opacity: 0.95;
 }
 
 .hero-stars::before,
 .hero-stars::after {
     content: "";
     position: absolute;
-    inset: -20%;
+    inset: 0;
     background-repeat: repeat;
-    will-change: opacity, transform;
+    will-change: opacity;
 }
 
 .hero-stars::before {
     background-image:
-        radial-gradient(1px 1px at 12% 18%, rgba(255, 255, 255, 0.5), transparent),
-        radial-gradient(1px 1px at 38% 72%, rgba(255, 255, 255, 0.28), transparent),
-        radial-gradient(1.5px 1.5px at 61% 34%, rgba(210, 220, 255, 0.4), transparent),
-        radial-gradient(1px 1px at 84% 58%, rgba(255, 255, 255, 0.35), transparent),
-        radial-gradient(1px 1px at 22% 91%, rgba(255, 255, 255, 0.22), transparent),
-        radial-gradient(1px 1px at 93% 12%, rgba(255, 255, 255, 0.38), transparent),
-        radial-gradient(1px 1px at 47% 44%, rgba(255, 255, 255, 0.18), transparent),
-        radial-gradient(1px 1px at 71% 81%, rgba(230, 235, 255, 0.32), transparent);
-    background-size: 260px 220px;
+        radial-gradient(1.5px 1.5px at 12% 18%, rgba(255, 255, 255, 0.95), transparent),
+        radial-gradient(1.2px 1.2px at 38% 72%, rgba(255, 255, 255, 0.7), transparent),
+        radial-gradient(2px 2px at 61% 34%, rgba(210, 220, 255, 0.85), transparent),
+        radial-gradient(1.4px 1.4px at 84% 58%, rgba(255, 255, 255, 0.75), transparent),
+        radial-gradient(1.2px 1.2px at 22% 91%, rgba(255, 255, 255, 0.65), transparent),
+        radial-gradient(1.5px 1.5px at 93% 12%, rgba(255, 255, 255, 0.8), transparent);
+    background-size: 220px 180px;
     animation: hero-stars-fade 8s ease-in-out infinite;
 }
 
 .hero-stars::after {
     background-image:
-        radial-gradient(1px 1px at 8% 42%, rgba(255, 255, 255, 0.25), transparent),
-        radial-gradient(1.5px 1.5px at 29% 11%, rgba(255, 255, 255, 0.42), transparent),
-        radial-gradient(1px 1px at 52% 63%, rgba(255, 255, 255, 0.2), transparent),
-        radial-gradient(1px 1px at 76% 27%, rgba(200, 210, 255, 0.35), transparent),
-        radial-gradient(1px 1px at 88% 88%, rgba(255, 255, 255, 0.3), transparent),
-        radial-gradient(1px 1px at 18% 67%, rgba(255, 255, 255, 0.15), transparent),
-        radial-gradient(1px 1px at 64% 9%, rgba(255, 255, 255, 0.28), transparent),
-        radial-gradient(1px 1px at 41% 52%, rgba(255, 255, 255, 0.22), transparent);
-    background-size: 300px 250px;
+        radial-gradient(1.2px 1.2px at 8% 42%, rgba(255, 255, 255, 0.6), transparent),
+        radial-gradient(2px 2px at 29% 11%, rgba(255, 255, 255, 0.9), transparent),
+        radial-gradient(1.2px 1.2px at 52% 63%, rgba(255, 255, 255, 0.55), transparent),
+        radial-gradient(1.5px 1.5px at 76% 27%, rgba(200, 210, 255, 0.75), transparent),
+        radial-gradient(1.3px 1.3px at 88% 88%, rgba(255, 255, 255, 0.7), transparent);
+    background-size: 280px 230px;
     animation: hero-stars-fade 11s ease-in-out infinite reverse;
     animation-delay: -3.5s;
 }
@@ -336,12 +335,12 @@ h4 {
 @keyframes hero-stars-fade {
     0%,
     100% {
-        opacity: 0.2;
+        opacity: 0.55;
         transform: translate3d(0, 0, 0) scale(1);
     }
     50% {
-        opacity: 0.48;
-        transform: translate3d(0, -3px, 0) scale(1.01);
+        opacity: 1;
+        transform: translate3d(0, -2px, 0) scale(1.01);
     }
 }
 
@@ -364,6 +363,12 @@ h4 {
     touch-action: none;
     overflow: hidden;
     transition: opacity 0.45s ease;
+    background: transparent;
+}
+
+.globe-canvas canvas,
+.moon-canvas canvas {
+    background: transparent !important;
 }
 
 /* Mini moon — own docked globe (same idea as Earth), not clipped through Earth canvas */
@@ -371,43 +376,52 @@ h4 {
     position: absolute;
     top: 10%;
     right: 14%;
-    z-index: 4;
-    width: 120px;
+    z-index: 5;
+    width: 132px;
+    height: 132px;
+    min-width: 132px;
+    min-height: 132px;
+    max-width: 132px;
+    max-height: 132px;
     pointer-events: auto;
+    visibility: visible;
+    opacity: 1;
     transition:
-        inset 0.5s ease,
-        width 0.5s ease,
-        top 0.5s ease,
-        right 0.5s ease,
-        opacity 0.4s ease,
-        transform 0.4s ease;
+        opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+        visibility 0s linear 0s;
 }
 
 .hero.earth-zoomed .moon-wrap {
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
-    transform: scale(0.94);
+    transition:
+        opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+        visibility 0s linear 0.55s;
 }
 
 .moon-dock {
-    width: 100%;
-    aspect-ratio: 1;
+    width: 132px;
+    height: 132px;
+    min-width: 132px;
+    min-height: 132px;
+    max-width: 132px;
+    max-height: 132px;
     border-radius: 50%;
     overflow: hidden;
-    background: radial-gradient(circle at 35% 30%, #1a1830 0%, #06060e 72%);
-    border: 1px solid rgba(125, 23, 244, 0.22);
-    box-shadow:
-        0 10px 36px rgba(0, 0, 0, 0.55),
-        0 0 0 1px rgba(255, 255, 255, 0.04) inset,
-        0 0 28px rgba(125, 23, 244, 0.1);
+    background: transparent;
+    border: none;
+    box-shadow: none;
 }
 
 .moon-canvas {
     position: relative;
-    width: 100% !important;
-    height: 100% !important;
-    min-height: 120px;
+    width: 132px !important;
+    height: 132px !important;
+    min-width: 132px !important;
+    min-height: 132px !important;
+    max-width: 132px !important;
+    max-height: 132px !important;
     display: block;
     cursor: pointer;
     touch-action: manipulation;
@@ -415,64 +429,10 @@ h4 {
 
 .moon-canvas canvas {
     display: block;
-    width: 100% !important;
-    height: 100% !important;
-}
-
-@media (min-width: 768px) {
-    .moon-wrap {
-        top: 9%;
-        right: 16%;
-        width: 148px;
-    }
-
-    .moon-canvas {
-        min-height: 148px;
-    }
-}
-
-@media (min-width: 1024px) {
-    .moon-wrap {
-        top: 8%;
-        right: 18%;
-        width: 168px;
-    }
-
-    .moon-canvas {
-        min-height: 168px;
-    }
-}
-
-.hero.moon-active .globe-canvas {
-    opacity: 0;
-    pointer-events: none;
-}
-
-.hero.moon-active .moon-wrap {
-    inset: 0;
-    top: 0;
-    right: 0;
-    width: 100% !important;
-    height: 100% !important;
-    max-width: none;
-    z-index: 6;
-    opacity: 1;
-    transform: none;
-}
-
-.hero.moon-active .moon-dock {
-    width: 100%;
-    height: 100%;
-    border-radius: 0;
-    border: none;
-    box-shadow: none;
-    background: #030308;
-}
-
-.hero.moon-active .moon-canvas {
-    width: 100% !important;
-    height: 100% !important;
-    min-height: 0;
+    width: 132px !important;
+    height: 132px !important;
+    max-width: 132px !important;
+    max-height: 132px !important;
 }
 
 .globe-canvas canvas {
@@ -890,11 +850,6 @@ h4 {
         width: min(300px, 30vw);
         transform: none;
     }
-}
-
-.hero.moon-active .office-preview-hero {
-    opacity: 0.35;
-    pointer-events: none;
 }
 
 .globe-canvas.globe-hovering {
@@ -1552,10 +1507,6 @@ h4 {
         font-size: 0.9rem;
     }
 
-    .hero.moon-active .validator-panel,
-    .hero.moon-active .office-preview-hero {
-        display: none;
-    }
 }
 
 @media (max-width: 1023px) {
