@@ -1,0 +1,712 @@
+[
+  {
+    "id": "ibm-ahmedabad",
+    "name": "IBM Ahmedabad",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-shenzhen",
+    "name": "IBM Shenzhen",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-dalian",
+    "name": "IBM Dalian",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-costa-mesa",
+    "name": "IBM Costa Mesa",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-southbury",
+    "name": "IBM Southbury",
+    "reason": "Documented closure (Southbury CT, 2025)"
+  },
+  {
+    "id": "ibm-canberra",
+    "name": "IBM Canberra",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-adelaide",
+    "name": "IBM Adelaide",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-manchester",
+    "name": "IBM Manchester",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-edinburgh",
+    "name": "IBM Edinburgh",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-vancouver",
+    "name": "IBM Vancouver",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-pittsburgh",
+    "name": "IBM Pittsburgh",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-columbus",
+    "name": "IBM Columbus",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-denver",
+    "name": "IBM Denver",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-phoenix",
+    "name": "IBM Phoenix",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-cork",
+    "name": "IBM Cork",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-nagpur",
+    "name": "IBM Nagpur",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-vizag",
+    "name": "IBM Visakhapatnam",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-guangzhou",
+    "name": "IBM Guangzhou",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-chengdu",
+    "name": "IBM Chengdu",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-wuhan",
+    "name": "IBM Wuhan",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-hanoi",
+    "name": "IBM Hanoi",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-fukuoka",
+    "name": "IBM Fukuoka",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-houston",
+    "name": "IBM Houston",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-miami",
+    "name": "IBM Miami",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-seattle",
+    "name": "IBM Seattle",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-bordeaux",
+    "name": "IBM Bordeaux",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-leipzig",
+    "name": "IBM Leipzig",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-trivandrum",
+    "name": "IBM Thiruvananthapuram",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-jaipur",
+    "name": "IBM Jaipur",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-indore",
+    "name": "IBM Indore",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-christchurch",
+    "name": "IBM Christchurch",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-kyoto",
+    "name": "IBM Kyoto",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-sapporo",
+    "name": "IBM Sapporo",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-hangzhou",
+    "name": "IBM Hangzhou",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-nanjing",
+    "name": "IBM Nanjing",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-tampa",
+    "name": "IBM Tampa",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-salt-lake-city",
+    "name": "IBM Salt Lake City",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-omaha",
+    "name": "IBM Omaha",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-minneapolis",
+    "name": "IBM Minneapolis",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-st-louis",
+    "name": "IBM St. Louis",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-detroit",
+    "name": "IBM Detroit",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-cleveland",
+    "name": "IBM Cleveland",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-philadelphia",
+    "name": "IBM Philadelphia",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-baltimore",
+    "name": "IBM Baltimore",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-richmond",
+    "name": "IBM Richmond",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-indianapolis",
+    "name": "IBM Indianapolis",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-edmonton",
+    "name": "IBM Edmonton",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-winnipeg",
+    "name": "IBM Winnipeg",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-guayaquil",
+    "name": "IBM Guayaquil",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-cordoba",
+    "name": "IBM Córdoba",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-rosario",
+    "name": "IBM Rosario",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-curitiba",
+    "name": "IBM Curitiba",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-porto-alegre",
+    "name": "IBM Porto Alegre",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-dusseldorf",
+    "name": "IBM Düsseldorf",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-stuttgart",
+    "name": "IBM Stuttgart",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-cologne",
+    "name": "IBM Cologne",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-toulouse",
+    "name": "IBM Toulouse",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-lille",
+    "name": "IBM Lille",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-nantes",
+    "name": "IBM Nantes",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-marseille",
+    "name": "IBM Marseille",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-geneva",
+    "name": "IBM Geneva",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-bern",
+    "name": "IBM Bern",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-basel",
+    "name": "IBM Basel",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-linz",
+    "name": "IBM Linz",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-graz",
+    "name": "IBM Graz",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-antwerp",
+    "name": "IBM Antwerp",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-rotterdam",
+    "name": "IBM Rotterdam",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-the-hague",
+    "name": "IBM The Hague",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-aarhus",
+    "name": "IBM Aarhus",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-gothenburg",
+    "name": "IBM Gothenburg",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-malmo",
+    "name": "IBM Malmö",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-nicosia",
+    "name": "IBM Cyprus",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-valletta",
+    "name": "IBM Malta",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-amman",
+    "name": "IBM Jordan",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-beirut",
+    "name": "IBM Lebanon",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-port-louis",
+    "name": "IBM Mauritius",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-gaborone",
+    "name": "IBM Botswana",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-chandigarh",
+    "name": "IBM Chandigarh",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-surat",
+    "name": "IBM Surat",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-lucknow",
+    "name": "IBM Lucknow",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-vadodara",
+    "name": "IBM Vadodara",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-xian",
+    "name": "IBM Xi'an",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-suzhou",
+    "name": "IBM Suzhou",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-qingdao",
+    "name": "IBM Qingdao",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-jinan",
+    "name": "IBM Jinan",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-hsinchu",
+    "name": "IBM Hsinchu",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-kaohsiung",
+    "name": "IBM Kaohsiung",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-busan",
+    "name": "IBM Busan",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-hiroshima",
+    "name": "IBM Hiroshima",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-sendai",
+    "name": "IBM Sendai",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-okinawa",
+    "name": "IBM Okinawa",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-johor-bahru",
+    "name": "IBM Johor Bahru",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-surabaya",
+    "name": "IBM Surabaya",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-bandung",
+    "name": "IBM Bandung",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-cebu",
+    "name": "IBM Cebu",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-davao",
+    "name": "IBM Davao",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-hobart",
+    "name": "IBM Hobart",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-darwin",
+    "name": "IBM Darwin",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-gold-coast",
+    "name": "IBM Gold Coast",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-hamilton-nz",
+    "name": "IBM Hamilton",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-belfast",
+    "name": "IBM Belfast",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-galway",
+    "name": "IBM Galway",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-hannover",
+    "name": "IBM Hannover",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-nuremberg",
+    "name": "IBM Nuremberg",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-bremen",
+    "name": "IBM Bremen",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-valencia",
+    "name": "IBM Valencia",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-seville",
+    "name": "IBM Seville",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-bilbao",
+    "name": "IBM Bilbao",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-porto",
+    "name": "IBM Porto",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-florence",
+    "name": "IBM Florence",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-naples",
+    "name": "IBM Naples",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-genoa",
+    "name": "IBM Genoa",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-puebla",
+    "name": "IBM Puebla",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-tijuana",
+    "name": "IBM Tijuana",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-cali",
+    "name": "IBM Cali",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-barranquilla",
+    "name": "IBM Barranquilla",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-belo-horizonte",
+    "name": "IBM Belo Horizonte",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-recife",
+    "name": "IBM Recife",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-salvador",
+    "name": "IBM Salvador",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-victoria",
+    "name": "IBM Victoria",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-san-antonio",
+    "name": "IBM San Antonio",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-portland",
+    "name": "IBM Portland",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-san-diego",
+    "name": "IBM San Diego",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-irvine",
+    "name": "IBM Irvine",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-sacramento",
+    "name": "IBM Sacramento",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-nashville",
+    "name": "IBM Nashville",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-memphis",
+    "name": "IBM Memphis",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-kansas-city",
+    "name": "IBM Kansas City",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-des-moines",
+    "name": "IBM Des Moines",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-cincinnati",
+    "name": "IBM Cincinnati",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-madurai",
+    "name": "IBM Madurai",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-mangaluru",
+    "name": "IBM Mangaluru",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-trichy",
+    "name": "IBM Trichy",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-harbin",
+    "name": "IBM Harbin",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-chongqing",
+    "name": "IBM Chongqing",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-macau",
+    "name": "IBM Macau",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-vientiane",
+    "name": "IBM Laos",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-phnom-penh",
+    "name": "IBM Cambodia",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-yangon",
+    "name": "IBM Myanmar",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-kampala",
+    "name": "IBM Uganda",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-maputo",
+    "name": "IBM Mozambique",
+    "reason": "No verified IBM office/CIC source"
+  },
+  {
+    "id": "ibm-harare",
+    "name": "IBM Zimbabwe",
+    "reason": "No verified IBM office/CIC source"
+  }
+]
