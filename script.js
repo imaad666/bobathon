@@ -3,6 +3,7 @@
 (function () {
     let globe = null;
     let activeFilter = "all";
+    let previewSite = null;
     const VIEW_PARAM_MAP = {
         offices: "office",
         office: "office",
@@ -29,14 +30,16 @@
     }
 
     function setFocus(site) {
-        const meta = SITE_TYPES[site.type];
+        const isMoon = (site.region || "").toLowerCase() === "moon";
+        const meta = SITE_TYPES[site.type] || SITE_TYPES.office;
         document.getElementById("focus-name").textContent = site.name;
         document.getElementById("focus-city").textContent = site.city;
-        document.getElementById("focus-type").textContent = meta.label;
-        document.getElementById("focus-icon").textContent = meta.abbr;
+        document.getElementById("focus-type").textContent = isMoon ? "Apollo" : meta.label;
+        document.getElementById("focus-icon").textContent = isMoon ? "A11" : meta.abbr;
         document.getElementById("focus-icon").style.background =
             `linear-gradient(135deg, ${meta.color}, #4f70ef)`;
-        document.getElementById("focus-pct").textContent = site.region?.slice(0, 3) || "—";
+        document.getElementById("focus-pct").textContent =
+            isMoon ? "Moon" : (site.region?.slice(0, 3) || "—");
         document.querySelector(".ring-fg").style.stroke = meta.color;
     }
 
@@ -44,7 +47,10 @@
         const el = document.getElementById("office-preview");
         if (!el) return;
 
-        if (!site) {
+        if (site) previewSite = site;
+        const currentSite = site || previewSite;
+
+        if (!currentSite) {
             el.innerHTML = `
                 <div class="office-preview-inner office-preview-empty">
                     <p class="office-preview-hint">Hover a site on the globe</p>
@@ -53,22 +59,24 @@
             return;
         }
 
-        const meta = SITE_TYPES[site.type] || SITE_TYPES.office;
+        const meta = SITE_TYPES[currentSite.type] || SITE_TYPES.office;
+        const siteLink =
+            currentSite.url || (currentSite.region === "Moon" ? "https://www.ibm.com/history/apollo" : "");
         el.innerHTML = `
             <div class="office-preview-inner">
                 <div class="office-preview-top">
                     <div class="office-preview-avatar" style="background:linear-gradient(135deg,${meta.color},#4f70ef)">${meta.abbr}</div>
                     <div>
                         <p class="office-preview-type" style="color:${meta.markerCore}">${meta.label}</p>
-                        <h4 class="office-preview-name">${site.name}</h4>
+                        <h4 class="office-preview-name">${currentSite.name}</h4>
                     </div>
                 </div>
                 <dl class="office-preview-meta">
-                    <div><dt>Location</dt><dd>${site.city}</dd></div>
-                    <div><dt>Region</dt><dd>${site.region || "—"}</dd></div>
-                    ${site.source ? `<div><dt>Source</dt><dd>${site.source}</dd></div>` : ""}
+                    <div><dt>Location</dt><dd>${currentSite.city}</dd></div>
+                    <div><dt>Region</dt><dd>${currentSite.region || "—"}</dd></div>
+                    ${currentSite.source ? `<div><dt>Source</dt><dd>${currentSite.source}</dd></div>` : ""}
                 </dl>
-                ${site.url ? `<p class="office-preview-link"><a href="${site.url}" target="_blank" rel="noopener noreferrer" style="color:${meta.markerCore}">IBM &amp; Apollo — read the story</a></p>` : ""}
+                ${siteLink ? `<p class="office-preview-link"><a href="${siteLink}" data-story-link="true" target="_blank" rel="noopener noreferrer" style="color:${meta.markerCore}">IBM &amp; Apollo — read the story</a></p>` : ""}
             </div>`;
     }
 
@@ -91,7 +99,8 @@
         const nextIdx = FILTERS.findIndex((item) => item.id === filter);
         activeFilter = nextIdx >= 0 ? FILTERS[nextIdx].id : "all";
         filterIdx = nextIdx >= 0 ? nextIdx : 0;
-        document.getElementById("view-label").textContent = FILTERS[filterIdx].label;
+        const viewLabel = document.getElementById("view-label");
+        if (viewLabel) viewLabel.textContent = FILTERS[filterIdx].label;
         // If user changes view while in moon mode, go back to Earth globe.
         window.__ibmSetMoonMode?.(false);
         setActiveNav(activeFilter);
@@ -168,12 +177,19 @@
         renderDashboardLegend();
         if (IBM_SITES.length) setFocus(IBM_SITES[0]);
         setActiveNav(activeFilter);
+        document.getElementById("office-preview")?.addEventListener("click", (e) => {
+            const link = e.target?.closest?.("a[data-story-link='true']");
+            if (!link) return;
+            e.preventDefault();
+            e.stopPropagation();
+            const href = link.getAttribute("href");
+            if (href) window.open(href, "_blank", "noopener,noreferrer");
+        });
         window.addEventListener("ibm-site-focus", (e) => {
-            setFocus(e.detail);
             renderSitePreview(e.detail);
         });
         window.addEventListener("ibm-site-hover", (e) => {
-            renderSitePreview(e.detail);
+            if (e.detail) renderSitePreview(e.detail);
             document.getElementById("globe")?.classList.toggle("globe-hovering", !!e.detail);
         });
 

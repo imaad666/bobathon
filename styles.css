@@ -490,43 +490,6 @@ h4 {
     color: #7dd3fc;
 }
 
-.hero-floats {
-    position: absolute;
-    top: 1rem;
-    left: 1rem;
-    right: auto;
-    z-index: 20;
-    display: flex;
-    gap: 0.5rem;
-}
-
-.float-btn {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    border: 1px solid rgba(125, 23, 244, 0.35);
-    background: rgba(12, 10, 22, 0.75);
-    color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow:
-        0 0 20px -5px rgba(125, 23, 244, 0.15),
-        inset 0 1px 0 rgba(125, 23, 244, 0.1);
-    backdrop-filter: blur(8px);
-    transition: border-color 0.15s;
-}
-
-.float-btn:hover {
-    border-color: rgba(125, 23, 244, 0.6);
-}
-
-.float-btn svg {
-    width: 20px;
-    height: 20px;
-}
-
 .validator-panel {
     display: none;
     position: absolute;
@@ -826,7 +789,7 @@ h4 {
     position: absolute;
     z-index: 22;
     width: min(320px, calc(100vw - 7.5rem));
-    pointer-events: none;
+    pointer-events: auto;
     top: auto;
     bottom: 5.5rem;
     left: 50%;
@@ -1154,31 +1117,6 @@ h4 {
 .region-num-office { color: var(--ibm-blue); }
 .region-num-client { color: var(--ibm-pink); }
 .region-num-partner { color: var(--ibm-orange); }
-
-.globe-legend {
-    position: absolute;
-    bottom: 1rem;
-    left: 1rem;
-    right: auto;
-    z-index: 18;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.65rem;
-    padding: 0.5rem 0.75rem;
-    background: var(--card);
-    border: 1px solid var(--card-border);
-    border-radius: 10px;
-    font-family: var(--font-sans);
-    font-size: var(--type-label);
-    font-weight: 500;
-    color: var(--text-muted);
-}
-
-.globe-legend span {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-}
 
 .dot {
     width: 8px;
@@ -1509,11 +1447,3 @@ h4 {
 
 }
 
-@media (max-width: 1023px) {
-    .globe-legend {
-        bottom: auto;
-        top: 4.5rem;
-        left: 1rem;
-        max-width: calc(100% - 7.5rem);
-    }
-}
