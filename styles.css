@@ -100,31 +100,6 @@ h4 {
     flex-shrink: 0;
 }
 
-.ibm-mark {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    width: 1.5rem;
-    height: 1.35rem;
-    justify-content: center;
-}
-
-.ibm-mark span {
-    display: block;
-    height: 2px;
-    background: var(--ibm-blue);
-    border-radius: 1px;
-}
-
-.ibm-mark span:nth-child(1) { width: 100%; }
-.ibm-mark span:nth-child(2) { width: 72%; }
-.ibm-mark span:nth-child(3) { width: 88%; }
-.ibm-mark span:nth-child(4) { width: 56%; }
-.ibm-mark span:nth-child(5) { width: 80%; }
-.ibm-mark span:nth-child(6) { width: 48%; }
-.ibm-mark span:nth-child(7) { width: 64%; }
-.ibm-mark span:nth-child(8) { width: 40%; }
-
 .brand-text {
     display: flex;
     align-items: baseline;

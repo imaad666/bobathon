@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About — IBM WRLD</title>
+    <link rel="icon" type="image/png" href="data/favicon-ibm-white.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Serif:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css?v=wrld26">
+    <style>
+        .about-wrap {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6.2rem 5vw 3rem;
+            background:
+                radial-gradient(ellipse 70% 60% at 16% 12%, rgba(15, 98, 254, 0.12), transparent 72%),
+                radial-gradient(ellipse 80% 64% at 84% 82%, rgba(138, 63, 252, 0.13), transparent 74%),
+                var(--bg);
+        }
+
+        .about-card {
+            width: min(1160px, 100%);
+            min-height: min(74vh, 820px);
+            padding: clamp(0.5rem, 1.4vw, 1rem) 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .about-title {
+            font-family: var(--font-serif);
+            font-size: clamp(2rem, 4.6vw, 3.6rem);
+            line-height: 1.12;
+            letter-spacing: -0.02em;
+            margin-bottom: clamp(1rem, 2.3vw, 1.6rem);
+            color: var(--text);
+        }
+
+        .about-copy {
+            font-family: var(--font-sans);
+            font-size: clamp(1.06rem, 1.7vw, 1.42rem);
+            color: var(--text-muted);
+            line-height: 1.72;
+            max-width: 60ch;
+        }
+
+        .about-copy + .about-copy {
+            margin-top: 1rem;
+        }
+
+        .about-back {
+            margin-top: clamp(1.15rem, 2.4vw, 1.9rem);
+            display: inline-block;
+            font-family: var(--font-mono);
+            font-size: clamp(0.88rem, 1vw, 1rem);
+            text-decoration: none;
+            color: var(--accent-2);
+        }
+
+        .about-back:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app">
+        <header class="header">
+            <a href="index.html" class="brand"><span class="brand-text"><span class="brand-ibm">IBM</span> <span
+                        class="brand-sub">WRLD</span></span></a>
+        </header>
+
+        <main class="about-wrap">
+            <section class="about-card">
+                <h1 class="about-title">About this project</h1>
+                <p class="about-copy">
+                    This IBM project was built by Imaad Irshad.
+                </p>
+                <p class="about-copy">
+                    Notes: IBM is something that has been part of all technical advancements and driven the evolution,
+                    every time, all throughout the world and even beyond. My attempt was to make it visual, which I
+                    built for this ICA Bobathon of 2026. My first IBM Hackathon of the many many more to come. Hope you
+                    like it, this is me trying to actually see the <em>Impact</em>, from a farther lens.
+                </p>
+                <a class="about-back" href="index.html">/back</a>
+            </section>
+        </main>
+    </div>
+</body>
+
+</html>

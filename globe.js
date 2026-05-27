@@ -2,13 +2,11 @@
  * IBM WRLD — globe.gl (stable API only)
  */
 (function () {
-    const STRIPE_DEG = 5.5;
     const TEX_W = 2048;
     const TEX_H = 1024;
     const OCEAN = "#030308";
     const LAND_BASE = "#121a2c";
-    const ANTARCTICA = "#e6ecf4";
-    const STRIPE_OPACITY = 0.11;
+    const LAND_MONOGRAM_URL = "data/Eye Bee M Monogram.png";
 
     function isAntarctica(f) {
         return f.id === "010" || f.properties?.name === "Antarctica";
@@ -19,9 +17,13 @@
         "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json",
     ];
 
-    function stripeHex(lat) {
-        const band = Math.floor((lat + 90) / STRIPE_DEG);
-        return band % 2 === 0 ? "#1b4d8c" : "#e8e4dc";
+    function loadImage(src) {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.onload = () => resolve(img);
+            img.onerror = reject;
+            img.src = src;
+        });
     }
 
     function markerMeta(types, type) {
@@ -39,8 +41,8 @@
             .translate([W / 2, H / 2]);
     }
 
-    /** Dark land base + faint IBM latitude stripes so blips stay readable */
-    function buildGlobeTexture(features, d3g) {
+    /** Dark globe with IBM monogram tiled over land (no stretch). */
+    async function buildGlobeTexture(features, d3g) {
         const W = TEX_W;
         const H = TEX_H;
         const canvas = document.createElement("canvas");
@@ -55,42 +57,47 @@
 
         ctx.fillStyle = LAND_BASE;
         for (const f of features) {
-            if (isAntarctica(f)) continue;
             ctx.beginPath();
             path(f);
             ctx.fill();
         }
 
-        const bands = Math.ceil(180 / STRIPE_DEG);
-        ctx.globalAlpha = STRIPE_OPACITY;
-        for (let b = 0; b < bands; b++) {
-            const latNorth = 90 - b * STRIPE_DEG;
-            const latSouth = Math.max(-90, latNorth - STRIPE_DEG);
-            const yTop = ((90 - latNorth) / 180) * H;
-            const yBot = ((90 - latSouth) / 180) * H;
-            const midLat = (latNorth + latSouth) / 2;
+        try {
+            const monogram = await loadImage(LAND_MONOGRAM_URL);
+            const cropPx = Math.max(
+                2,
+                Math.min(10, Math.round(Math.min(monogram.naturalWidth, monogram.naturalHeight) * 0.035))
+            );
+            const srcW = Math.max(1, monogram.naturalWidth - cropPx * 2);
+            const srcH = Math.max(1, monogram.naturalHeight - cropPx * 2);
+
+            // Keep texture crisp at globe resolution while staying seamless.
+            const tileH = Math.max(140, Math.min(220, srcH));
+            const tileW = Math.max(96, Math.round((tileH * srcW) / srcH));
+            const tile = document.createElement("canvas");
+            tile.width = tileW;
+            tile.height = tileH;
+            const tileCtx = tile.getContext("2d");
+            tileCtx.imageSmoothingEnabled = true;
+            tileCtx.imageSmoothingQuality = "high";
+            tileCtx.drawImage(monogram, cropPx, cropPx, srcW, srcH, 0, 0, tileW, tileH);
 
             ctx.save();
             ctx.beginPath();
-            ctx.rect(0, yTop, W, Math.max(1, yBot - yTop));
-            ctx.clip();
-            ctx.fillStyle = stripeHex(midLat);
             for (const f of features) {
-                if (isAntarctica(f)) continue;
-                ctx.beginPath();
                 path(f);
-                ctx.fill();
             }
+            ctx.clip();
+            ctx.globalAlpha = 0.34;
+            const pattern = ctx.createPattern(tile, "repeat");
+            if (pattern) {
+                ctx.fillStyle = pattern;
+                ctx.fillRect(-tileW, -tileH, W + tileW * 2, H + tileH * 2);
+            }
+            ctx.globalAlpha = 1;
             ctx.restore();
-        }
-        ctx.globalAlpha = 1;
-
-        ctx.fillStyle = ANTARCTICA;
-        for (const f of features) {
-            if (!isAntarctica(f)) continue;
-            ctx.beginPath();
-            path(f);
-            ctx.fill();
+        } catch {
+            // If monogram fails to load, keep the clean dark land fallback.
         }
 
         return canvas.toDataURL("image/png");
@@ -372,7 +379,7 @@
                 const world = await fetchMap();
                 const land = topo.feature(world, world.objects.countries);
 
-                this._g.globeImageUrl(buildGlobeTexture(land.features, d3g));
+                this._g.globeImageUrl(await buildGlobeTexture(land.features, d3g));
                 this._updateLayers();
                 enableTransparentSky(this._g);
                 window.dispatchEvent(new Event("ibm-globe-ready"));
