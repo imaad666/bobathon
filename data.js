@@ -16,18 +16,18 @@ const SITE_TYPES = {
         abbr: "C",
     },
     partner: {
-        label: "Dependency",
+        label: "Partner",
         color: "#ff832b",
         markerCore: "#ffab4d",
         markerGlow: "rgba(255, 171, 77, 0.6)",
-        abbr: "D",
+        abbr: "P",
     },
     initiative: {
-        label: "Initiative",
+        label: "Program",
         color: "#8a3ffc",
         markerCore: "#b47aff",
         markerGlow: "rgba(180, 122, 255, 0.65)",
-        abbr: "I",
+        abbr: "PG",
     },
 };
 
@@ -263,8 +263,9 @@ const REGIONS = ["Americas", "EMEA", "APAC"];
 const IBM_ACTIVITIES = [
     { type: "office", name: "Gatineau CIC", location: "Quebec, Canada", metric: "Cloud hub", value: "Active" },
     { type: "client", name: "JPMorgan Chase", location: "New York", metric: "Contract", value: "Renewed" },
-    { type: "partner", name: "Confluent", location: "Mountain View", metric: "Acquired", value: "2026" },
-    { type: "initiative", name: "Anderon Foundry", location: "Albany, NY", metric: "CHIPS", value: "$2B" },
+    { type: "partner", name: "Confluent", location: "Mountain View, CA", metric: "Status", value: "Acquisition completed" },
+    { type: "initiative", name: "Anderon Foundry", location: "Albany, NY", metric: "CHIPS", value: "LOI announced (proposed $2B)" },
+    { type: "initiative", name: "IBM Think 2026", location: "Boston, MA", metric: "Event", value: "Held May 2026" },
 ];
 
 const IBM_STATS = {

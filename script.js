@@ -84,8 +84,8 @@
         { id: "all", label: "All sites" },
         { id: "office", label: "Offices" },
         { id: "client", label: "Clients" },
-        { id: "partner", label: "Dependencies" },
-        { id: "initiative", label: "Initiatives" },
+        { id: "partner", label: "Partners" },
+        { id: "initiative", label: "Programs" },
     ];
     let filterIdx = 0;
 
